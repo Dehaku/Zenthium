@@ -404,7 +404,7 @@ int main()
     sf::Clock clock;
 	// Create our main SFGUI window
 
-	attributesMenu.sfGuiwindow->SetTitle( "Title" );
+	attributesMenu.sfGuiwindow->SetTitle( "Zenthium" );
 	attributesMenu.buildMenu();
 
 
