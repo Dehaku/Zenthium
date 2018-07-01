@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<FileVersion major="1" minor="0" />
+	<ActiveTarget name="Release" />
+	<File name="src\Shapes.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="605" topLine="13" />
+		</Cursor>
+		<Folding>
+			<Collapse line="15" />
+			<Collapse line="25" />
+			<Collapse line="44" />
+			<Collapse line="49" />
+			<Collapse line="62" />
+			<Collapse line="71" />
+			<Collapse line="94" />
+			<Collapse line="112" />
+			<Collapse line="128" />
+			<Collapse line="142" />
+			<Collapse line="156" />
+			<Collapse line="162" />
+			<Collapse line="179" />
+			<Collapse line="206" />
+			<Collapse line="217" />
+			<Collapse line="224" />
+			<Collapse line="233" />
+			<Collapse line="241" />
+			<Collapse line="248" />
+			<Collapse line="267" />
+			<Collapse line="279" />
+			<Collapse line="283" />
+			<Collapse line="285" />
+			<Collapse line="299" />
+			<Collapse line="309" />
+			<Collapse line="319" />
+			<Collapse line="333" />
+			<Collapse line="350" />
+			<Collapse line="366" />
+			<Collapse line="383" />
+			<Collapse line="385" />
+			<Collapse line="389" />
+			<Collapse line="402" />
+			<Collapse line="418" />
+			<Collapse line="420" />
+			<Collapse line="424" />
+			<Collapse line="436" />
+			<Collapse line="451" />
+			<Collapse line="464" />
+			<Collapse line="471" />
+			<Collapse line="488" />
+			<Collapse line="490" />
+			<Collapse line="507" />
+			<Collapse line="513" />
+			<Collapse line="523" />
+			<Collapse line="537" />
+			<Collapse line="548" />
+			<Collapse line="560" />
+			<Collapse line="579" />
+			<Collapse line="591" />
+			<Collapse line="593" />
+			<Collapse line="601" />
+			<Collapse line="605" />
+			<Collapse line="622" />
+			<Collapse line="636" />
+			<Collapse line="654" />
+			<Collapse line="669" />
+			<Collapse line="686" />
+			<Collapse line="691" />
+			<Collapse line="696" />
+			<Collapse line="709" />
+			<Collapse line="714" />
+			<Collapse line="723" />
+		</Folding>
+	</File>
+	<File name="src\Shapes.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="209" topLine="0" />
+		</Cursor>
+		<Folding>
+			<Collapse line="16" />
+			<Collapse line="20" />
+			<Collapse line="58" />
+			<Collapse line="105" />
+			<Collapse line="123" />
+			<Collapse line="151" />
+			<Collapse line="162" />
+			<Collapse line="175" />
+			<Collapse line="186" />
+			<Collapse line="197" />
+			<Collapse line="202" />
+			<Collapse line="204" />
+			<Collapse line="208" />
+		</Folding>
+	</File>
+	<File name="src\BigUnsigned.hh" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="45" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="src\main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4631" topLine="153" />
+		</Cursor>
+		<Folding>
+			<Collapse line="134" />
+			<Collapse line="144" />
+			<Collapse line="212" />
+			<Collapse line="214" />
+			<Collapse line="222" />
+			<Collapse line="337" />
+		</Folding>
+	</File>
+	<File name="src\InputState.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="410" topLine="0" />
+		</Cursor>
+		<Folding>
+			<Collapse line="22" />
+		</Folding>
+	</File>
+</CodeBlocks_layout_file>

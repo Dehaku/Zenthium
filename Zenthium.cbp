@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Zenthium" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/Zenthium" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="sfml-graphics-d" />
+					<Add library="sfml-window-d" />
+					<Add library="sfml-system-d" />
+					<Add library="C:/sfgui/lib/libsfgui-d.a" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/Zenthium" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="sfml-graphics" />
+					<Add library="sfml-window" />
+					<Add library="sfml-system" />
+					<Add library="C:/sfgui/lib/libsfgui.a" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="C:/SFML-2.4.2/include" />
+			<Add directory="C:/sfgui/include" />
+		</Compiler>
+		<Linker>
+			<Add library="mingw32" />
+			<Add library="user32" />
+			<Add library="gdi32" />
+			<Add library="winmm" />
+			<Add library="dxguid" />
+			<Add directory="C:/SFML-2.4.2/lib" />
+		</Linker>
+		<Unit filename="cb.bmp" />
+		<Unit filename="src/BigInteger.cc" />
+		<Unit filename="src/BigInteger.hh" />
+		<Unit filename="src/BigIntegerAlgorithms.cc" />
+		<Unit filename="src/BigIntegerAlgorithms.hh" />
+		<Unit filename="src/BigIntegerLibrary.hh" />
+		<Unit filename="src/BigIntegerUtils.cc" />
+		<Unit filename="src/BigIntegerUtils.hh" />
+		<Unit filename="src/BigUnsigned.cc" />
+		<Unit filename="src/BigUnsigned.hh" />
+		<Unit filename="src/BigUnsignedInABase.cc" />
+		<Unit filename="src/BigUnsignedInABase.hh" />
+		<Unit filename="src/Camera.cpp" />
+		<Unit filename="src/Camera.h" />
+		<Unit filename="src/InputState.cpp" />
+		<Unit filename="src/InputState.h" />
+		<Unit filename="src/NumberlikeArray.hh" />
+		<Unit filename="src/RichText.cpp" />
+		<Unit filename="src/RichText.hpp" />
+		<Unit filename="src/SaveLoad.cpp" />
+		<Unit filename="src/SaveLoad.h" />
+		<Unit filename="src/Shapes.cpp" />
+		<Unit filename="src/Shapes.h" />
+		<Unit filename="src/Text.cpp" />
+		<Unit filename="src/Text.h" />
+		<Unit filename="src/Textures.cpp" />
+		<Unit filename="src/Textures.h" />
+		<Unit filename="src/defs.cpp" />
+		<Unit filename="src/defs.h" />
+		<Unit filename="src/filesystemUtils.cpp" />
+		<Unit filename="src/filesystemUtils.hpp" />
+		<Unit filename="src/globalvars.cpp" />
+		<Unit filename="src/globalvars.h" />
+		<Unit filename="src/main.cpp" />
+		<Unit filename="src/math.cpp" />
+		<Unit filename="src/math.h" />
+		<Unit filename="src/util.cpp" />
+		<Unit filename="src/util.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
