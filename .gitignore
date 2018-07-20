@@ -1,2 +1,6 @@
 
 
+*.o
+Zenthium.cbp
+Zenthium.depend
+Zenthium.layout
