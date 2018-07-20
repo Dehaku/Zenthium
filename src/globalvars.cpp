@@ -249,7 +249,7 @@ namespace gvars
 {
 int hovering = 0;
 std::vector<sf::Vector2f> slotPos;
-std::string version = "0.0.1.0";
+std::string version = "0.0.0.1";
 unsigned int framesPassed = 0;
 bool debug = false;
 bool inFocus = true;

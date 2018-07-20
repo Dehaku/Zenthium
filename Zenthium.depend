@@ -36,7 +36,7 @@
 1509768248 source:c:\projects\zenthium\src\bigunsignedinabase.cc
 	"BigUnsignedInABase.hh"
 
-1525047323 source:c:\projects\zenthium\src\main.cpp
+1532118882 source:c:\projects\zenthium\src\main.cpp
 	<SFML/Graphics.hpp>
 	<iostream>
 	<memory>
@@ -48,6 +48,8 @@
 	"globalvars.h"
 	"util.h"
 	"InputState.h"
+	"Shapes.h"
+	"Camera.h"
 
 1486739997 c:\sfml-2.4.2\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -491,7 +493,7 @@
 	<string>
 	<vector>
 
-1510471726 source:c:\projects\zenthium\src\globalvars.cpp
+1532118761 source:c:\projects\zenthium\src\globalvars.cpp
 	"globalvars.h"
 	<iostream>
 	"InputState.h"

@@ -1,0 +1,6 @@
+
+*.exe
+*.o
+*.o
+*.depend
+*.layout
