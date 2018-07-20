@@ -640,6 +640,7 @@ void renderWorld()
     sf::Sprite worldSprite;
     worldSprite.setTexture(chunkTexture);
     worldSprite.setPosition(0,0);
+    worldSprite.setScale(0.5,0.5);
 
     sf::View oldView = window.getView();
     window.setView(gvars::view1);
@@ -801,25 +802,13 @@ int main()
             {
                 if (event.mouseWheel.delta > 0)
                 {
-                    {
-                        std::cout << "Zoom Out \n";
-                        if (gvars::cameraZoom < 2)
-                        {
-                            gvars::cameraZoom = gvars::cameraZoom / 0.5;
-                            gvars::view1.zoom(0.5);
-                        }
-                    }
+                    std::cout << "Zoom Out \n";
+                    cameraZoomOut();
                 }
                 if (event.mouseWheel.delta < 0)
                 {
-                    {
-                       std::cout << "Zoom In \n";
-                        if (gvars::cameraZoom > 0.5)
-                        {
-                            gvars::cameraZoom = gvars::cameraZoom / 2;
-                            gvars::view1.zoom(2);
-                        }
-                    }
+                    std::cout << "Zoom In \n";
+                    cameraZoomIn();
                 }
                 //Develop the scaling camera, Probably using .setsize instead of zoom.
                 //http://www.sfml-dev.org/tutorials/2.0/graphics-view.php
