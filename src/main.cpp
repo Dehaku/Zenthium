@@ -12,6 +12,7 @@
 #include "InputState.h"
 #include "Shapes.h"
 #include "Camera.h"
+#include "FastNoise.h"
 
 class Globals
 {
@@ -77,6 +78,83 @@ public:
         */
     }
 
+    void genWorldNoise()
+    {
+        // Favs: PerlinFractal, 0.05 Freq || ValueFractal, 0.05 Freq
+
+        FastNoise myNoise; // Create a FastNoise object
+        if(random(0,1) == 1)
+            myNoise.SetNoiseType(FastNoise::PerlinFractal); // Set the desired noise type
+        else
+            myNoise.SetNoiseType(FastNoise::ValueFractal);
+        myNoise.SetSeed(random(1,100000));
+        myNoise.SetFrequency(0.05);
+
+        float heightMap[100][100]; // 2D heightmap to create terrain
+        int highestValue = 0;
+        int lowestValue = 0;
+        for (int x = 0; x < 100; x++)
+        {
+            for (int y = 0; y < 100; y++)
+            {
+                heightMap[x][y] = myNoise.GetNoise(x,y)*1000;
+                heightMap[x][y] = (int) heightMap[x][y];
+                if(heightMap[x][y] < lowestValue)
+                    lowestValue = heightMap[x][y];
+                if(heightMap[x][y] > highestValue)
+                    highestValue = heightMap[x][y];
+            }
+        }
+        std::cout << "H: " << highestValue << ", L: " << lowestValue << std::endl;
+        int heightRange = highestValue + -lowestValue;
+        std::cout << "R: " << heightRange << std::endl;
+
+        int waterLevel = lowestValue + heightRange/2;
+        int dirtLevel = lowestValue + heightRange/2 + heightRange/4;
+        int grassLevel = lowestValue + heightRange/2 + heightRange/4 + heightRange/8;
+        int stoneLevel = lowestValue + heightRange/2 + heightRange/4;
+
+        std::cout << "W: " << waterLevel << ", D: " << dirtLevel  << " G: " << grassLevel << ", S: " << stoneLevel << std::endl;
+
+        for(int i = 0; i != tiles.size(); i++)
+            for(int t = 0; t != tiles[i].size(); t++)
+        {
+
+            if(heightMap[i][t] <= 0)
+                tiles[i][t].type = 1;
+            else if(heightMap[i][t] > 0  && heightMap[i][t] < 100)
+                tiles[i][t].type = 2;
+            else if(heightMap[i][t] >= 100  && heightMap[i][t] < 180)
+                tiles[i][t].type = 3;
+            else if(heightMap[i][t] >= 180)
+                tiles[i][t].type = 4;
+
+        }
+
+        /*
+
+        float heightMap[32][32]; // 2D heightmap to create terrain
+
+        for (int x = 0; x < 20; x++)
+        {
+            for (int y = 0; y < 20; y++)
+            {
+                heightMap[x][y] = myNoise.GetNoise(x,y)*1000;
+                heightMap[x][y] = (int) heightMap[x][y];
+            }
+        }
+
+        for (int x = 0; x < 20; x++)
+        {
+            for (int y = 0; y < 20; y++)
+            {
+                std::cout << heightMap[x][y] << ", ";
+            }
+            std::cout << std::endl;
+        }
+        */
+    }
+
     void randomizeWorld()
     {
         for(int i = 0; i != tiles.size(); i++)
@@ -86,6 +164,7 @@ public:
             RWL.addEntry("Water",20);
             RWL.addEntry("Dirt",0);
             RWL.addEntry("Grass",80);
+            RWL.addEntry("Stone",0);
             int rolledTile = RWL.getRandomSlot();
             if(rolledTile == 0)
                 tiles[i][t].type = 1;
@@ -93,6 +172,8 @@ public:
                 tiles[i][t].type = 2;
             if(rolledTile == 2)
                 tiles[i][t].type = 3;
+            if(rolledTile == 3)
+                tiles[i][t].type = 4;
 
         }
     }
@@ -611,6 +692,7 @@ void buildChunkImage()
     static sf::Texture &grassTex = texturemanager.getTexture("mapTile_Grass.png");
     static sf::Texture &waterTex = texturemanager.getTexture("mapTile_Water.png");
     static sf::Texture &dirtTex = texturemanager.getTexture("mapTile_Dirt.png");
+    static sf::Texture &stoneTex = texturemanager.getTexture("mapTile_Stone.png");
 
     chunkImage.create(world.tiles.size()*64,world.tiles.size()*64,sf::Color::Transparent);
 
@@ -633,6 +715,10 @@ void buildChunkImage()
         if(world.tiles[i][t].type == 3)
         {
             chunkImage.copy(grassTex.copyToImage(),drawPos.x,drawPos.y);
+        }
+        if(world.tiles[i][t].type == 4)
+        {
+            chunkImage.copy(stoneTex.copyToImage(),drawPos.x,drawPos.y);
         }
     }
 
@@ -714,6 +800,19 @@ void evolveWorld()
         std::cout << "T:" << clock.getElapsedTime().asMicroseconds() << std::endl;
         clock.restart();
     }
+
+    if(inputState.key[Key::M].time == 1)
+    {
+        sf::Clock clock;
+        clock.restart();
+        world.genWorldNoise();
+        std::cout << "World Gen:" << clock.getElapsedTime().asMicroseconds() << std::endl;
+        clock.restart();
+
+        buildChunkImage();
+        std::cout << "T:" << clock.getElapsedTime().asMicroseconds() << std::endl;
+        clock.restart();
+    }
 }
 
 
@@ -737,10 +836,14 @@ void setup()
     sf::Clock clock;
     clock.restart();
 
-    for(int i = 0; i != 10; i++)
-        world.evolveWorldDiag();
-
+    world.genWorldNoise();
     std::cout << "World Gen:" << clock.getElapsedTime().asMicroseconds() << std::endl;
+    clock.restart();
+
+    // for(int i = 0; i != 10; i++)
+    //     world.evolveWorldDiag();
+
+    std::cout << "World Evolve:" << clock.getElapsedTime().asMicroseconds() << std::endl;
     clock.restart();
 
     buildChunkImage();
