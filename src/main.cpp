@@ -82,7 +82,18 @@ public:
         for(int i = 0; i != tiles.size(); i++)
             for(int t = 0; t != tiles[i].size(); t++)
         {
-            tiles[i][t].type = random(1,3);
+            RandomWeightList RWL;
+            RWL.addEntry("Water",20);
+            RWL.addEntry("Dirt",0);
+            RWL.addEntry("Grass",80);
+            int rolledTile = RWL.getRandomSlot();
+            if(rolledTile == 0)
+                tiles[i][t].type = 1;
+            if(rolledTile == 1)
+                tiles[i][t].type = 2;
+            if(rolledTile == 2)
+                tiles[i][t].type = 3;
+
         }
     }
 
@@ -271,26 +282,29 @@ public:
                 {
                     int waterTiles = tileCountNeighborsDiag(i,t,tiles[i][t].type);
                     if(waterTiles <= 1)
-                        tiles[i][t].type = 3;
-                }
-
-                if(tiles[i][t].type == 2)
-                {
-                    int waterTiles = tileCountNeighborsDiag(i,t,1);
-                    if(waterTiles > 0)
-                        tiles[i][t].type = 3;
-                }
-
-                if(tiles[i][t].type == 3)
-                {
-                    int grassTiles = tileCountNeighborsDiag(i,t,2);
-                    int waterTiles = tileCountNeighborsDiag(i,t,1);
-                    if(waterTiles > 0)
-                        continue;
-                    if(grassTiles > 0)
                         tiles[i][t].type = 2;
+                }
+
+
+                else if(tiles[i][t].type == 2)
+                {
+                    int grassTiles = tileCountNeighborsDiag(i,t,3);
+                    int waterTiles = tileCountNeighborsDiag(i,t,1);
+                    if(grassTiles > 0 && waterTiles == 0)
+                        tiles[i][t].type = 3;
+                    if(grassTiles == 0)
+                        tiles[i][t].type = 1;
 
                 }
+
+                else if(tiles[i][t].type == 3)
+                {
+                    int waterTiles = tileCountNeighborsDiag(i,t,1);
+                    if(waterTiles > 0)
+                        tiles[i][t].type = 2;
+                }
+
+
 
 
 
@@ -594,9 +608,9 @@ void buildChunkImage()
 {
 
 
-    static sf::Texture &grassTex = texturemanager.getTexture("mapTile_022.png");
-    static sf::Texture &waterTex = texturemanager.getTexture("mapTile_188.png");
-    static sf::Texture &dirtTex = texturemanager.getTexture("mapTile_082.png");
+    static sf::Texture &grassTex = texturemanager.getTexture("mapTile_Grass.png");
+    static sf::Texture &waterTex = texturemanager.getTexture("mapTile_Water.png");
+    static sf::Texture &dirtTex = texturemanager.getTexture("mapTile_Dirt.png");
 
     chunkImage.create(world.tiles.size()*64,world.tiles.size()*64,sf::Color::Transparent);
 
@@ -613,12 +627,12 @@ void buildChunkImage()
 
         if(world.tiles[i][t].type == 2)
         {
-            chunkImage.copy(grassTex.copyToImage(),drawPos.x,drawPos.y);
+            chunkImage.copy(dirtTex.copyToImage(),drawPos.x,drawPos.y);
         }
 
         if(world.tiles[i][t].type == 3)
         {
-            chunkImage.copy(dirtTex.copyToImage(),drawPos.x,drawPos.y);
+            chunkImage.copy(grassTex.copyToImage(),drawPos.x,drawPos.y);
         }
     }
 
@@ -677,14 +691,28 @@ void evolveWorld()
     }
     if(inputState.key[Key::V].time == 1)
     {
+        sf::Clock clock;
+        clock.restart();
         world.evolveWorldDiag();
+        std::cout << "T:" << clock.getElapsedTime().asMicroseconds() << std::endl;
+        clock.restart();
         buildChunkImage();
+        std::cout << "T:" << clock.getElapsedTime().asMicroseconds() << std::endl;
     }
     if(inputState.key[Key::B].time == 1)
     {
+        sf::Clock clock;
+        clock.restart();
+
         for(int i = 0; i != 10; i++)
             world.evolveWorldDiag();
+
+        std::cout << "T:" << clock.getElapsedTime().asMicroseconds() << std::endl;
+        clock.restart();
+
         buildChunkImage();
+        std::cout << "T:" << clock.getElapsedTime().asMicroseconds() << std::endl;
+        clock.restart();
     }
 }
 
@@ -697,10 +725,27 @@ void setup()
     if (!gvars::defaultFont.loadFromFile("data/fonts/Xolonium-Regular.otf"))
         throw std::runtime_error("Failed to load font!");
 
+    std::cout << "==Loading Textures== \n";
     texturemanager.init();
+    std::cout << "==Making Test Characters== \n";
     makeTestCharacters();
+    std::cout << "==Displaying Test Characters== \n";
     displayTestCharacters();
+
+    // ==World Gen==
+    std::cout << "==Generating World== \n";
+    sf::Clock clock;
+    clock.restart();
+
+    for(int i = 0; i != 10; i++)
+        world.evolveWorldDiag();
+
+    std::cout << "World Gen:" << clock.getElapsedTime().asMicroseconds() << std::endl;
+    clock.restart();
+
     buildChunkImage();
+    std::cout << "World Image:" << clock.getElapsedTime().asMicroseconds() << std::endl;
+    // ==World Gen End==
 }
 
 void loop()
