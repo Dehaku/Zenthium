@@ -257,6 +257,15 @@ public:
                     if(waterTiles == 4)
                         tiles[i][t].type = 1;
 
+                // If water on both sides, become water
+                if(tiles[i][t].type != 1 && i != 0 && i != tiles.size()-1 && t != 0 && t != tiles.size()-1)
+                {
+                    if(tiles[i-1][t].type == 1 && tiles[i+1][t].type == 1)
+                        tiles[i][t].type = 1;
+                    if(tiles[i][t-1].type == 1 && tiles[i][t+1].type == 1)
+                        tiles[i][t].type = 1;
+                }
+
 
                 if(tiles[i][t].type == 1)
                 {
@@ -669,6 +678,12 @@ void evolveWorld()
     if(inputState.key[Key::V].time == 1)
     {
         world.evolveWorldDiag();
+        buildChunkImage();
+    }
+    if(inputState.key[Key::B].time == 1)
+    {
+        for(int i = 0; i != 10; i++)
+            world.evolveWorldDiag();
         buildChunkImage();
     }
 }
