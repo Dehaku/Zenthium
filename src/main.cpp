@@ -658,15 +658,18 @@ void evolveWorld()
     if(inputState.key[Key::Z].time == 1)
     {
         world.randomizeWorld();
+        buildChunkImage();
     }
 
     if(inputState.key[Key::Space].time == 1)
     {
         world.evolveWorld();
+        buildChunkImage();
     }
     if(inputState.key[Key::V].time == 1)
     {
         world.evolveWorldDiag();
+        buildChunkImage();
     }
 }
 
