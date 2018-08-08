@@ -395,6 +395,11 @@ public:
     sfg::Adjustment::Ptr freqAdjustment;
     sfg::Entry::Ptr freqEntry;
     sfg::Button::Ptr setFreq_button;
+    int seedValue;
+    sfg::Entry::Ptr seedEntry;
+    sfg::Button::Ptr setSeed_button;
+    //sfg::Button::Ptr setSeedRan_button;
+
 
 
     void buildMenu()
@@ -446,9 +451,11 @@ public:
         setFreq_button = sfg::Button::Create( L"Set Freq" );
 
 
-        freqAdjustment->SetValue(0.05); // Recommended Default
         freqAdjustment->SetLower( 0.01f );
         freqAdjustment->SetUpper( 0.2f );
+        freqAdjustment->SetValue(0.05); // Recommended Default
+        frequencyValue = 0.05;
+
 
 
         // How much it should change when clicked on the stepper.
@@ -481,14 +488,31 @@ public:
         hbox2->Pack( freqEntry, false );
         hbox2->Pack( setFreq_button, false );
 
+        auto seedTextLabel = sfg::Label::Create("Seed: ");
+        seedEntry = sfg::Entry::Create();
+        seedEntry->SetRequisition( sf::Vector2f( 80.f, 0.f ) );
+        setSeed_button = sfg::Button::Create( L"Set Seed" );
+        seedValue = world.seed;
+        seedEntry->SetText(std::to_string(world.seed));
 
 
+        setSeed_button->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&] {
+            seedValue = std::stoi((std::string)seedEntry->GetText());
+        } );
+
+        auto setSeedRan_button = sfg::Button::Create( L"Random Seed" );
+        setSeedRan_button->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&] {
+            seedValue = random(0,1000000);
+            seedEntry->SetText(std::to_string(seedValue));
+        } );
 
 
 
 
         auto hbox3 = sfg::Box::Create( sfg::Box::Orientation::HORIZONTAL, 5 );
-
+        hbox3->Pack( seedEntry, false );
+        hbox3->Pack( setSeed_button, false );
+        hbox3->Pack( setSeedRan_button, false );
 
         auto vbox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 5 );
         vbox->Pack( hbox, false );
@@ -526,7 +550,8 @@ public:
         } );
 
         gen_button->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&world, this] {
-            world.genWorldNoise(worldNoiseType,frequencyValue);
+            world.genWorldNoise(worldNoiseType,frequencyValue,seedValue);
+            seedEntry->SetText(std::to_string(world.seed));
             buildChunkImage();
         } );
 
