@@ -52,9 +52,66 @@ class WorldTile
 public:
     int type;
     sf::Vector2i pos;
+    bool buildable;
+    bool water;
+    bool mountain;
+
+    void makeWater()
+    {
+        type = 1;
+        water = true;
+        buildable = false;
+        mountain = false;
+    }
+    void makeDirt()
+    {
+        type = 2;
+        water = false;
+        buildable = true;
+        mountain = false;
+    }
+    void makeGrass()
+    {
+        type = 3;
+        water = false;
+        buildable = true;
+        mountain = false;
+    }
+    void makeStone()
+    {
+        type = 4;
+        water = false;
+        buildable = false;
+        mountain = true;
+    }
+
     WorldTile()
     {
         type = random(1,3);
+    }
+};
+
+class Territory
+{
+public:
+    std::string name;
+    unsigned int id;
+    sf::Color color;
+    sf::Color borderColor;
+    std::vector<sf::Vector2i> territoryQuickList; // Stores territory positions for cross checking and saving.
+    class Plot
+    {
+    public:
+        WorldTile* worldTile;
+        int growth;
+    };
+    std::vector<Plot> plots;
+
+    Territory()
+    {
+        name = generateName();
+        color = sf::Color(random(0,255),random(0,255),random(0,255));
+        borderColor = sf::Color(random(0,255),random(0,255),random(0,255));
     }
 };
 
@@ -64,6 +121,7 @@ public:
     int id;
     int seed;
     std::vector<std::vector<WorldTile>> tiles;
+    std::list<Territory> territories;
 
     void genWorld()
     {
@@ -129,15 +187,16 @@ public:
         for(int i = 0; i != tiles.size(); i++)
             for(int t = 0; t != tiles[i].size(); t++)
         {
+            tiles[i][t].pos = sf::Vector2i(i,t);
 
             if(heightMap[i][t] <= waterLevel)
-                tiles[i][t].type = 1;
+                tiles[i][t].makeWater();
             else if(heightMap[i][t] > waterLevel  && heightMap[i][t] < dirtLevel)
-                tiles[i][t].type = 2;
+                tiles[i][t].makeDirt();
             else if(heightMap[i][t] >= dirtLevel  && heightMap[i][t] < grassLevel)
-                tiles[i][t].type = 3;
+                tiles[i][t].makeGrass();
             else if(heightMap[i][t] >= grassLevel)
-                tiles[i][t].type = 4;
+                tiles[i][t].makeStone();
 
         }
     }
@@ -380,6 +439,55 @@ public:
         }
     }
 
+    bool isPlotTaken(sf::Vector2i plotPos)
+    {
+        for(auto &terr : territories)
+            for(auto &pos : terr.territoryQuickList)
+                if(plotPos == pos)
+                    return true;
+
+        return false;
+    }
+
+    void genTerritories()
+    {
+        for(int i = 0; i != 100; i++)
+        {
+            sf::Vector2i stakePos;
+            bool validStake = false;
+            int failSafe = 0;
+            while(validStake == false && failSafe < 10000) // Find a buildable, unclaimed tile to start the territory.
+            {
+                sf::Vector2i testPos(random(5,95),random(5,95)); // Avoiding borders for sanity.
+                if(tiles[testPos.x][testPos.y].buildable == false)
+                    continue;
+                if(isPlotTaken(testPos))
+                    continue;
+
+                validStake = true;
+                stakePos = testPos;
+
+                failSafe++; // This is to prevent infinite loops.
+                if(failSafe == 9000)
+                    std::cout << "*WARNING* GenTerritories failsafe hit 9000 attempts \n";
+            }
+
+            if(validStake)
+            {
+                Territory terr;
+
+                //terr.plots
+                terr.territoryQuickList.push_back(tiles[stakePos.x][stakePos.y].pos);
+
+
+
+                territories.push_back(terr);
+            }
+
+
+
+        }
+    }
 
 };
 World world;
@@ -570,6 +678,8 @@ public:
     }
 };
 WorldMenu worldMenu;
+
+
 
 
 std::string notate(BigInteger bignum)
@@ -989,6 +1099,17 @@ void evolveWorld()
     }
 }
 
+void evolveTerritories()
+{
+    if(inputState.key[Key::Q].time == 1)
+        world.genTerritories();
+
+    for(auto &terr : world.territories)
+    {
+        sf::Vector2i terrPos = terr.territoryQuickList[0];
+        shapes.createSquare((terrPos.x*32)-10+16,(terrPos.y*32)-10+16,(terrPos.x*32)+10+16,(terrPos.y*32)+10+16,terr.color,2,terr.borderColor);
+    }
+}
 
 
 
@@ -1035,6 +1156,7 @@ void loop()
 
     renderWorld();
     evolveWorld();
+    evolveTerritories();
 
     shapes.createCircle(gvars::mousePos.x,gvars::mousePos.y,5,sf::Color::Cyan);
     fpsKeeper.calcFPS();
