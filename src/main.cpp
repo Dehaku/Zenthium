@@ -81,14 +81,6 @@ public:
         */
     }
 
-    std::string testFunc(FastNoise::NoiseType noiseType = FastNoise::PerlinFractal)
-    {
-        if(noiseType == FastNoise::PerlinFractal)
-            return "Whomp";
-        else
-            return "Whaddup \n";
-    }
-
     void genWorldNoise(FastNoise::NoiseType noiseType = FastNoise::PerlinFractal, float frequencyValue = 0.05, int seedValue = -1)
     {
         // Favs: PerlinFractal, 0.05 Freq || ValueFractal, 0.05 Freq
@@ -397,6 +389,12 @@ public:
     sfg::Label::Ptr sel_label;
     FastNoise::NoiseType worldNoiseType;
     sfg::Button::Ptr gen_button;
+    float frequencyValue;
+    sfg::Label::Ptr freqLabel;
+    sfg::Scale::Ptr freqScale;
+    sfg::Adjustment::Ptr freqAdjustment;
+    sfg::Entry::Ptr freqEntry;
+    sfg::Button::Ptr setFreq_button;
 
 
     void buildMenu()
@@ -422,7 +420,8 @@ public:
         combo_box->AppendItem( "White Noise" );
 
         combo_box->SelectItem(0);
-        worldNoiseType = FastNoise::PerlinFractal;
+        worldNoiseType = FastNoise::PerlinFractal; // Recommended Default
+
 
 
         sel_label = sfg::Label::Create( L"Please select an item!" );
@@ -434,9 +433,69 @@ public:
         hbox->Pack( combo_box );
         hbox->Pack( gen_button, false );
 
+
+        auto freqTextLabel = sfg::Label::Create("Frequency: ");
+        freqLabel = sfg::Label::Create("0.05");
+        //freqLabel->SetText( "20" );
+        freqScale = sfg::Scale::Create( sfg::Scale::Orientation::HORIZONTAL );
+
+
+        freqAdjustment = freqScale->GetAdjustment();
+        freqEntry = sfg::Entry::Create();
+        freqEntry->SetRequisition( sf::Vector2f( 80.f, 0.f ) );
+        setFreq_button = sfg::Button::Create( L"Set Freq" );
+
+
+        freqAdjustment->SetValue(0.05); // Recommended Default
+        freqAdjustment->SetLower( 0.01f );
+        freqAdjustment->SetUpper( 0.2f );
+
+
+        // How much it should change when clicked on the stepper.
+        freqAdjustment->SetMinorStep( 0.01f );
+        // How much it should change when clicked on the trough.
+        freqAdjustment->SetMajorStep( 0.05f );
+
+        freqAdjustment->GetSignal( sfg::Adjustment::OnChange ).Connect( [&] {
+            frequencyValue = freqAdjustment->GetValue();
+            std::stringstream sstr;
+            sstr << freqAdjustment->GetValue();
+            freqLabel->SetText( sstr.str() );
+            freqEntry->SetText( sstr.str() );
+        } );
+        freqScale->SetRequisition( sf::Vector2f( 80.f, 20.f ) );
+
+        setFreq_button->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&] {
+            float freqFloatValue = std::stof((std::string)freqEntry->GetText());
+            frequencyValue = freqFloatValue;
+            freqAdjustment->SetValue(freqFloatValue);
+            freqLabel->SetText( freqEntry->GetText() );
+            freqEntry->SetText( freqEntry->GetText() );
+        } );
+
+
+        auto hbox2 = sfg::Box::Create( sfg::Box::Orientation::HORIZONTAL, 5 );
+        hbox2->Pack( freqTextLabel, false );
+        hbox2->Pack( freqScale, false );
+        hbox2->Pack( freqLabel, false );
+        hbox2->Pack( freqEntry, false );
+        hbox2->Pack( setFreq_button, false );
+
+
+
+
+
+
+
+        auto hbox3 = sfg::Box::Create( sfg::Box::Orientation::HORIZONTAL, 5 );
+
+
         auto vbox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 5 );
         vbox->Pack( hbox, false );
-        vbox->Pack( sel_label, true );
+        vbox->Pack( hbox2, false );
+        vbox->Pack( hbox3, false );
+
+        // vbox->Pack( sel_label, true );
 
         // Add the combo box to the window
         sfGuiwindow->Add( vbox );
@@ -467,7 +526,7 @@ public:
         } );
 
         gen_button->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&world, this] {
-            world.genWorldNoise(worldNoiseType);
+            world.genWorldNoise(worldNoiseType,frequencyValue);
             buildChunkImage();
         } );
 
