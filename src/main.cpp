@@ -14,6 +14,8 @@
 #include "Camera.h"
 #include "FastNoise.h"
 
+void buildChunkImage();
+
 class Globals
 {
 public:
@@ -60,6 +62,7 @@ class World
 {
 public:
     int id;
+    int seed;
     std::vector<std::vector<WorldTile>> tiles;
 
     void genWorld()
@@ -78,17 +81,30 @@ public:
         */
     }
 
-    void genWorldNoise()
+    std::string testFunc(FastNoise::NoiseType noiseType = FastNoise::PerlinFractal)
+    {
+        if(noiseType == FastNoise::PerlinFractal)
+            return "Whomp";
+        else
+            return "Whaddup \n";
+    }
+
+    void genWorldNoise(FastNoise::NoiseType noiseType = FastNoise::PerlinFractal, float frequencyValue = 0.05, int seedValue = -1)
     {
         // Favs: PerlinFractal, 0.05 Freq || ValueFractal, 0.05 Freq
 
         FastNoise myNoise; // Create a FastNoise object
-        if(random(0,1) == 1)
-            myNoise.SetNoiseType(FastNoise::PerlinFractal); // Set the desired noise type
+        myNoise.SetNoiseType(noiseType);
+
+        myNoise.SetFrequency(frequencyValue);
+        if(seedValue == -1)
+        {
+            seed = random(1,100000);
+            myNoise.SetSeed(seed);
+        }
         else
-            myNoise.SetNoiseType(FastNoise::ValueFractal);
-        myNoise.SetSeed(random(1,100000));
-        myNoise.SetFrequency(0.05);
+            myNoise.SetSeed(seedValue);
+        seed = seedValue;
 
         float heightMap[100][100]; // 2D heightmap to create terrain
         int highestValue = 0;
@@ -372,6 +388,98 @@ public:
 
 };
 World world;
+
+class WorldMenu
+{
+public:
+    sfg::Window::Ptr sfGuiwindow;
+    sfg::ComboBox::Ptr combo_box;
+    sfg::Label::Ptr sel_label;
+    FastNoise::NoiseType worldNoiseType;
+    sfg::Button::Ptr gen_button;
+
+
+    void buildMenu()
+    {
+        sfGuiwindow->SetTitle( "World Settings" );
+        combo_box = sfg::ComboBox::Create();
+
+        auto com_label = sfg::Label::Create( L"World Type: " );
+
+        // Set the entries of the combo box.
+        combo_box->AppendItem( "Perlin Fractal" );
+        combo_box->AppendItem( "Value Fractal" );
+        combo_box->AppendItem( "^Recommended^" );
+        combo_box->AppendItem( "Value" );
+        combo_box->AppendItem( "Value Fractal" );
+        combo_box->AppendItem( "Perlin" );
+        combo_box->AppendItem( "Perlin Fractal" );
+        combo_box->AppendItem( "Simplex" );
+        combo_box->AppendItem( "Simplex Fractal" );
+        combo_box->AppendItem( "Cubic" );
+        combo_box->AppendItem( "Cubic Fractal" );
+        combo_box->AppendItem( "Cellular" );
+        combo_box->AppendItem( "White Noise" );
+
+        combo_box->SelectItem(0);
+        worldNoiseType = FastNoise::PerlinFractal;
+
+
+        sel_label = sfg::Label::Create( L"Please select an item!" );
+
+        gen_button = sfg::Button::Create( L"Generate!" );
+
+        auto hbox = sfg::Box::Create( sfg::Box::Orientation::HORIZONTAL, 5 );
+        hbox->Pack( com_label );
+        hbox->Pack( combo_box );
+        hbox->Pack( gen_button, false );
+
+        auto vbox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 5 );
+        vbox->Pack( hbox, false );
+        vbox->Pack( sel_label, true );
+
+        // Add the combo box to the window
+        sfGuiwindow->Add( vbox );
+
+        combo_box->GetSignal( sfg::ComboBox::OnSelect ).Connect( [&] {
+        if(combo_box->GetSelectedItem() == 0 || combo_box->GetSelectedItem() == 6)
+            worldNoiseType = FastNoise::PerlinFractal;
+        if(combo_box->GetSelectedItem() == 1 || combo_box->GetSelectedItem() == 4)
+            worldNoiseType = FastNoise::ValueFractal;
+        if(combo_box->GetSelectedItem() == 3)
+            worldNoiseType = FastNoise::Value;
+        if(combo_box->GetSelectedItem() == 5)
+            worldNoiseType = FastNoise::Perlin;
+        if(combo_box->GetSelectedItem() == 7)
+            worldNoiseType = FastNoise::Simplex;
+        if(combo_box->GetSelectedItem() == 8)
+            worldNoiseType = FastNoise::SimplexFractal;
+        if(combo_box->GetSelectedItem() == 9)
+            worldNoiseType = FastNoise::Cubic;
+        if(combo_box->GetSelectedItem() == 10)
+            worldNoiseType = FastNoise::CubicFractal;
+        if(combo_box->GetSelectedItem() == 11)
+            worldNoiseType = FastNoise::Cellular;
+        if(combo_box->GetSelectedItem() == 12)
+            worldNoiseType = FastNoise::WhiteNoise;
+
+            sel_label->SetText( "Item " + std::to_string( combo_box->GetSelectedItem() ) + " selected with text \"" + combo_box->GetSelectedText() + "\"" );
+        } );
+
+        gen_button->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&world, this] {
+            world.genWorldNoise(worldNoiseType);
+            buildChunkImage();
+        } );
+
+        sfGuiwindow->Update( 0.f );
+    }
+
+    WorldMenu()
+    {
+        sfGuiwindow = sfg::Window::Create();
+    }
+};
+WorldMenu worldMenu;
 
 
 std::string notate(BigInteger bignum)
@@ -907,8 +1015,9 @@ int main()
     sf::Clock clock;
 	// Create our main SFGUI window
 
-	attributesMenu.sfGuiwindow->SetTitle( "Zenthium" );
-	attributesMenu.buildMenu();
+	// attributesMenu.sfGuiwindow->SetTitle( "Zenthium" );
+	// attributesMenu.buildMenu();
+	worldMenu.buildMenu();
 
 
 
@@ -935,7 +1044,8 @@ int main()
         {
             inputState.updateFromEvent(event);
             // Handle events
-			attributesMenu.sfGuiwindow->HandleEvent( event );
+			//attributesMenu.sfGuiwindow->HandleEvent( event );
+			worldMenu.sfGuiwindow->HandleEvent( event );
             // Close window : exit
             if (event.type == sf::Event::Closed)
                 window.close();
@@ -963,7 +1073,7 @@ int main()
         // Update the GUI every 5ms
 		if( clock.getElapsedTime().asMicroseconds() >= 5000 ) {
 			// Update() takes the elapsed time in seconds.
-			attributesMenu.sfGuiwindow->Update( static_cast<float>( clock.getElapsedTime().asMicroseconds() ) / 1000000.f );
+			worldMenu.sfGuiwindow->Update( static_cast<float>( clock.getElapsedTime().asMicroseconds() ) / 1000000.f );
 
 			clock.restart();
 		}
