@@ -95,8 +95,11 @@ public:
             myNoise.SetSeed(seed);
         }
         else
+        {
             myNoise.SetSeed(seedValue);
-        seed = seedValue;
+            seed = seedValue;
+        }
+
 
         float heightMap[100][100]; // 2D heightmap to create terrain
         int highestValue = 0;
@@ -398,7 +401,7 @@ public:
     int seedValue;
     sfg::Entry::Ptr seedEntry;
     sfg::Button::Ptr setSeed_button;
-    //sfg::Button::Ptr setSeedRan_button;
+    sfg::Label::Ptr currentSeedLabel;
 
 
 
@@ -494,6 +497,7 @@ public:
         setSeed_button = sfg::Button::Create( L"Set Seed" );
         seedValue = world.seed;
         seedEntry->SetText(std::to_string(world.seed));
+        currentSeedLabel = sfg::Label::Create(std::to_string(world.seed));
 
 
         setSeed_button->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&] {
@@ -513,6 +517,7 @@ public:
         hbox3->Pack( seedEntry, false );
         hbox3->Pack( setSeed_button, false );
         hbox3->Pack( setSeedRan_button, false );
+        hbox3->Pack( currentSeedLabel, false );
 
         auto vbox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 5 );
         vbox->Pack( hbox, false );
@@ -552,6 +557,7 @@ public:
         gen_button->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&world, this] {
             world.genWorldNoise(worldNoiseType,frequencyValue,seedValue);
             seedEntry->SetText(std::to_string(world.seed));
+            currentSeedLabel->SetText(std::to_string(world.seed));
             buildChunkImage();
         } );
 
