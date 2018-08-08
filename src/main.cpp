@@ -55,6 +55,7 @@ public:
     bool buildable;
     bool water;
     bool mountain;
+    int territoryGrowthRate;
 
     void makeWater()
     {
@@ -62,6 +63,7 @@ public:
         water = true;
         buildable = false;
         mountain = false;
+        territoryGrowthRate = 10;
     }
     void makeDirt()
     {
@@ -69,6 +71,7 @@ public:
         water = false;
         buildable = true;
         mountain = false;
+        territoryGrowthRate = 3;
     }
     void makeGrass()
     {
@@ -76,6 +79,7 @@ public:
         water = false;
         buildable = true;
         mountain = false;
+        territoryGrowthRate = 1;
     }
     void makeStone()
     {
@@ -83,6 +87,7 @@ public:
         water = false;
         buildable = false;
         mountain = true;
+        territoryGrowthRate = 10;
     }
 
     WorldTile()
@@ -104,8 +109,14 @@ public:
     public:
         WorldTile* worldTile;
         int growth;
+        bool surrounded;
+        Plot()
+        {
+            growth = 1; // How many growTerritory iterations until it may grow a new tile. 1 for land, 10 for rivers
+            surrounded = false;
+        }
     };
-    std::vector<Plot> plots;
+    std::list<Plot> plots;
 
     Territory()
     {
@@ -449,6 +460,16 @@ public:
         return false;
     }
 
+    bool isPlotViable(sf::Vector2i plotPos)
+    {
+        if(isPlotTaken(plotPos))
+            return false;
+        if(tiles[plotPos.x][plotPos.y].buildable == false)
+            return false;
+
+        return true;
+    }
+
     void genTerritories()
     {
         for(int i = 0; i != 100; i++)
@@ -476,10 +497,11 @@ public:
             {
                 Territory terr;
 
-                //terr.plots
+                Territory::Plot newPlot;
+                newPlot.growth = 1;
+                newPlot.worldTile = &tiles[stakePos.x][stakePos.y];
+                terr.plots.push_back(newPlot);
                 terr.territoryQuickList.push_back(tiles[stakePos.x][stakePos.y].pos);
-
-
 
                 territories.push_back(terr);
             }
@@ -489,6 +511,91 @@ public:
         }
     }
 
+    void growTerritories()
+    {
+        for(auto &terr : territories)
+        {
+            for(auto &plot : terr.plots)
+            {
+                if(plot.surrounded) // No more tiles to expand into, stop pinging this one.
+                    continue;
+                if(plot.growth > 0) // Still growing, grow and move on.
+                {
+                    plot.growth--;
+                    continue;
+                }
+                sf::Vector2i ourPos = plot.worldTile->pos;
+                bool areWeSurrounded = true;
+                bool leftClear = false;
+                bool rightClear = false;
+                bool upClear = false;
+                bool downClear = false;
+                { // JIC Surrounded check
+
+                    if(ourPos.x != 0 && isPlotViable(tiles[ourPos.x-1][ourPos.y].pos))
+                    {
+                        areWeSurrounded = false;
+                        leftClear = true;
+                    }
+                    if(ourPos.x != tiles.size()-1 && isPlotViable(tiles[ourPos.x+1][ourPos.y].pos))
+                    {
+                        rightClear = true;
+                        areWeSurrounded = false;
+                    }
+                    if(ourPos.y != 0 && isPlotViable(tiles[ourPos.x][ourPos.y-1].pos))
+                    {
+                        upClear = true;
+                        areWeSurrounded = false;
+                    }
+                    if(ourPos.y != tiles.size()-1 && isPlotViable(tiles[ourPos.x][ourPos.y+1].pos))
+                    {
+                        downClear = true;
+                        areWeSurrounded = false;
+                    }
+
+                }
+
+                if(areWeSurrounded == true)
+                { // Update plot, and move on.
+                    plot.surrounded = true;
+                    continue;
+                }
+
+                // Now we can finally grow.
+
+                RandomWeightList RWL;
+                if(leftClear)
+                    RWL.addEntry("L",1);
+                if(rightClear)
+                    RWL.addEntry("R",1);
+                if(upClear)
+                    RWL.addEntry("U",1);
+                if(downClear)
+                    RWL.addEntry("D",1);
+
+                std::string direction = RWL.getRandomName();
+                sf::Vector2i workPos = ourPos;
+                if(direction == "L")
+                    workPos.x--;
+                else if(direction == "R")
+                    workPos.x++;
+                else if(direction == "U")
+                    workPos.y--;
+                else if(direction == "D")
+                    workPos.y++;
+
+                Territory::Plot newPlot;
+                newPlot.worldTile = &tiles[workPos.x][workPos.y];
+                newPlot.growth = tiles[workPos.x][workPos.y].territoryGrowthRate;
+                terr.plots.push_back(newPlot);
+                terr.territoryQuickList.push_back(tiles[workPos.x][workPos.y].pos);
+
+                // Resetting our growth rate!
+                plot.growth = tiles[ourPos.x][ourPos.y].territoryGrowthRate;
+
+            }
+        }
+    }
 };
 World world;
 
@@ -1048,18 +1155,12 @@ void updateMousePos()
 
 void evolveWorld()
 {
-    if(inputState.key[Key::Z].time == 1)
-    {
-        world.randomizeWorld();
-        buildChunkImage();
-    }
-
-    if(inputState.key[Key::Space].time == 1)
+    if(inputState.key[Key::Space].time == 1 && true == false)
     {
         world.evolveWorld();
         buildChunkImage();
     }
-    if(inputState.key[Key::V].time == 1)
+    if(inputState.key[Key::V].time == 1 && true == false)
     {
         sf::Clock clock;
         clock.restart();
@@ -1069,7 +1170,7 @@ void evolveWorld()
         buildChunkImage();
         std::cout << "T:" << clock.getElapsedTime().asMicroseconds() << std::endl;
     }
-    if(inputState.key[Key::B].time == 1)
+    if(inputState.key[Key::B].time == 1 && true == false)
     {
         sf::Clock clock;
         clock.restart();
@@ -1085,29 +1186,26 @@ void evolveWorld()
         clock.restart();
     }
 
-    if(inputState.key[Key::M].time == 1)
-    {
-        sf::Clock clock;
-        clock.restart();
-        world.genWorldNoise();
-        std::cout << "World Gen:" << clock.getElapsedTime().asMicroseconds() << std::endl;
-        clock.restart();
-
-        buildChunkImage();
-        std::cout << "T:" << clock.getElapsedTime().asMicroseconds() << std::endl;
-        clock.restart();
-    }
 }
 
 void evolveTerritories()
 {
     if(inputState.key[Key::Q].time == 1)
         world.genTerritories();
+    if(inputState.key[Key::W].time == 1)
+        world.growTerritories();
 
     for(auto &terr : world.territories)
     {
-        sf::Vector2i terrPos = terr.territoryQuickList[0];
-        shapes.createSquare((terrPos.x*32)-10+16,(terrPos.y*32)-10+16,(terrPos.x*32)+10+16,(terrPos.y*32)+10+16,terr.color,2,terr.borderColor);
+        sf::Color mainColor = terr.color;
+        mainColor.a = 100;
+        sf::Color borderColor = terr.borderColor;
+        for(auto &plot : terr.territoryQuickList)
+        {
+            sf::Vector2i terrPos = plot;
+            shapes.createSquare((terrPos.x*32)-14+16,(terrPos.y*32)-14+16,(terrPos.x*32)+14+16,(terrPos.y*32)+14+16,mainColor,2,borderColor);
+        }
+
     }
 }
 
