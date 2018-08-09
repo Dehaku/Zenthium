@@ -99,6 +99,9 @@ public:
 class Territory
 {
 public:
+    sf::Texture texture;
+    int leftMost, upMost, rightMost, downMost;
+
     std::string name;
     unsigned int id;
     sf::Color color;
@@ -596,6 +599,55 @@ public:
             }
         }
     }
+
+    void buildTerritoryImages()
+    {
+        for(auto &terr : territories)
+        {
+            sf::Image image;
+            // First, we figure out our bounds, left, up, right, down. This will be our image size.
+            int leftMost, upMost, rightMost, downMost;
+            if(terr.territoryQuickList.empty())
+                continue;
+
+            leftMost = terr.territoryQuickList[0].x;
+            upMost = terr.territoryQuickList[0].y;
+            rightMost = terr.territoryQuickList[0].x;
+            downMost = terr.territoryQuickList[0].y;
+
+            // Thankfully we can use the quick list for positions.
+            for(auto &pos : terr.territoryQuickList)
+            {
+                if(leftMost > pos.x)
+                    leftMost = pos.x;
+                if(upMost > pos.y)
+                    upMost = pos.y;
+                if(rightMost < pos.x)
+                    rightMost = pos.x;
+                if(downMost < pos.y)
+                    downMost = pos.y;
+            }
+            terr.leftMost = leftMost;
+            terr.upMost = upMost;
+            terr.rightMost = rightMost;
+            terr.downMost = downMost;
+
+            // std::cout << "L:" << leftMost << ",R:" << rightMost << ", U:" << upMost << "D:" << downMost << std::endl;
+
+            image.create(((rightMost*32)+16)-((leftMost*32)-16),((downMost*32)+16)-((upMost*32)-16),sf::Color::Transparent); // (0,0,0,100)
+
+            sf::Image tileImage;
+            tileImage.create(32,32,terr.color);
+
+            for(auto &pos : terr.territoryQuickList)
+            {
+                image.copy(tileImage,(pos.x-leftMost)*32,(pos.y-upMost)*32);
+            }
+
+            terr.texture.loadFromImage(image);
+        }
+    }
+
 };
 World world;
 
@@ -1120,31 +1172,29 @@ void buildChunkImage()
 
 void renderWorld()
 {
+    sf::View oldView = window.getView();
+    window.setView(gvars::view1);
 
-    /*
-    for(int i = 0; i != 10; i++)
-        for(int t = 0; t != 10; t++)
-    {
-        sf::Color drawColor;
-        if(world.tiles[i][t].type == 1)
-            drawColor = sf::Color::Blue;
-        if(world.tiles[i][t].type == 2)
-            drawColor = sf::Color(0,150,0);
-        if(world.tiles[i][t].type == 3)
-            drawColor = sf::Color(100,100,0);
-        shapes.createSquare(i*32,t*32,(i*32)+32,(t*32)+32,drawColor);
-
-    }
-    */
 
     sf::Sprite worldSprite;
     worldSprite.setTexture(chunkTexture);
     worldSprite.setPosition(0,0);
     worldSprite.setScale(0.5,0.5);
-
-    sf::View oldView = window.getView();
-    window.setView(gvars::view1);
     window.draw(worldSprite);
+
+
+    for(auto &terr : world.territories)
+    {
+        sf::Sprite territorySprite;
+        territorySprite.setTexture(terr.texture);
+        territorySprite.setPosition(terr.leftMost*32,terr.upMost*32);
+        window.draw(territorySprite);
+
+    }
+
+
+
+
     window.setView(oldView);
 }
 
@@ -1193,8 +1243,13 @@ void evolveTerritories()
     if(inputState.key[Key::Q].time == 1)
         world.genTerritories();
     if(inputState.key[Key::W].time == 1)
+    {
         world.growTerritories();
+        world.buildTerritoryImages();
+    }
 
+
+    if(inputState.key[Key::U])
     for(auto &terr : world.territories)
     {
         sf::Color mainColor = terr.color;
