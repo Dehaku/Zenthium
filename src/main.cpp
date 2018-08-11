@@ -100,6 +100,7 @@ class Territory
 {
 public:
     sf::Texture texture;
+    bool canGrow;
     int leftMost, upMost, rightMost, downMost;
 
     std::string name;
@@ -134,6 +135,7 @@ class World
 public:
     int id;
     int seed;
+    bool territoriesDoneGrowing = false;
     std::vector<std::vector<WorldTile>> tiles;
     std::list<Territory> territories;
 
@@ -473,16 +475,22 @@ public:
         return true;
     }
 
-    void genTerritories()
+    void genTerritories(int amountOfTerritories = 100, std::vector<sf::Vector2i> unstakedTiles = std::vector<sf::Vector2i>())
     {
-        for(int i = 0; i != 100; i++)
+        for(int i = 0; i != amountOfTerritories; i++)
         {
             sf::Vector2i stakePos;
             bool validStake = false;
             int failSafe = 0;
-            while(validStake == false && failSafe < 10000) // Find a buildable, unclaimed tile to start the territory.
+            if(unstakedTiles.empty())
+                while(validStake == false && failSafe < 100) // Find a buildable, unclaimed tile to start the territory.
             {
-                sf::Vector2i testPos(random(5,95),random(5,95)); // Avoiding borders for sanity.
+
+                failSafe++; // This is to prevent infinite loops.
+                if(failSafe == 90)
+                    std::cout << "*WARNING* GenTerritories failsafe hit 90 attempts \n";
+
+                sf::Vector2i testPos(random(0,99),random(0,99));
                 if(tiles[testPos.x][testPos.y].buildable == false)
                     continue;
                 if(isPlotTaken(testPos))
@@ -490,10 +498,22 @@ public:
 
                 validStake = true;
                 stakePos = testPos;
+            }
+            else
+            {
+                while(validStake == false)
+                {
+                    sf::Vector2i workPlot;
+                    workPlot = unstakedTiles[random(0,unstakedTiles.size()-1)];
+                    if(tiles[workPlot.x][workPlot.y].buildable == false)
+                        continue;
+                    if(isPlotTaken(workPlot))
+                        continue;
 
-                failSafe++; // This is to prevent infinite loops.
-                if(failSafe == 9000)
-                    std::cout << "*WARNING* GenTerritories failsafe hit 9000 attempts \n";
+                    validStake = true;
+                    stakePos = workPlot;
+                }
+
             }
 
             if(validStake)
@@ -512,16 +532,34 @@ public:
 
 
         }
+        territoriesDoneGrowing = false;
     }
 
-    void growTerritories()
+    std::vector<sf::Vector2i> getUnclaimedLand()
     {
+        std::vector<sf::Vector2i> returnList;
+        for(int i = 0; i != tiles.size(); i++)
+            for(int t = 0; t != tiles[i].size(); t++)
+        {
+            sf::Vector2i workPlot(i,t);
+            if(isPlotViable(workPlot))
+                returnList.push_back(workPlot);
+        }
+
+        return returnList;
+    }
+
+    bool growTerritories() // Returns true if territories can keep growing
+    {
+        int stagnantTerritories = 0;
         for(auto &terr : territories)
         {
+            bool canGrowMore = false; // Vital for multiple rounds of territory placement.
             for(auto &plot : terr.plots)
             {
                 if(plot.surrounded) // No more tiles to expand into, stop pinging this one.
                     continue;
+                canGrowMore = true;
                 if(plot.growth > 0) // Still growing, grow and move on.
                 {
                     plot.growth--;
@@ -597,7 +635,21 @@ public:
                 plot.growth = tiles[ourPos.x][ourPos.y].territoryGrowthRate;
 
             }
+
+            if(!canGrowMore)
+                stagnantTerritories++;
+
         }
+        // if(stagnantTerritories > 0)
+        //     std::cout << "Stagnant Territories: " << stagnantTerritories << std::endl;
+        if(stagnantTerritories == territories.size())
+        {
+            territoriesDoneGrowing = false;
+            return false;
+        }
+
+
+        return true; // Returns true if territories can keep growing
     }
 
     void buildTerritoryImages()
@@ -901,6 +953,7 @@ public:
             seedEntry->SetText(std::to_string(world.seed));
             currentSeedLabel->SetText(std::to_string(world.seed));
             buildChunkImage();
+            world.territories.clear();
         } );
 
         sfGuiwindow->Update( 0.f );
@@ -1320,7 +1373,20 @@ void evolveTerritories()
         world.genTerritories();
     if(inputState.key[Key::W].time == 1)
     {
-        world.growTerritories();
+        bool territoriesCanGrow = world.growTerritories();
+        if(!territoriesCanGrow)
+        {
+            // std::cout << "Territories cannot grow any further. \n";
+
+            std::vector<sf::Vector2i> unclaimedLandLeft = world.getUnclaimedLand();
+            // std::cout << unclaimedLandLeft.size() << " viable land tiles remaining. "<< std::endl;
+            // std::cout << "Genning " << (unclaimedLandLeft.size()/10)+1 << " territories. \n";
+            if(unclaimedLandLeft.size() != 0)
+                world.genTerritories((unclaimedLandLeft.size()/10)+1,unclaimedLandLeft);
+            else
+                std::cout << "The land has been claimed! \n";
+        }
+
         world.buildTerritoryImages();
     }
 
