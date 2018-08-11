@@ -602,6 +602,18 @@ public:
 
     void buildTerritoryImages()
     {
+
+        sf::Texture border1N;
+        sf::Texture border1E;
+        sf::Texture border1S;
+        sf::Texture border1W;
+        {
+            border1N.loadFromFile("data\\gfx\\borders.png", sf::IntRect(0, 0, 32, 32));
+            border1E.loadFromFile("data\\gfx\\borders.png", sf::IntRect(32, 0, 32, 32));
+            border1S.loadFromFile("data\\gfx\\borders.png", sf::IntRect(64, 0, 32, 32));
+            border1W.loadFromFile("data\\gfx\\borders.png", sf::IntRect(96, 0, 32, 32));
+        }
+
         for(auto &terr : territories)
         {
             sf::Image image;
@@ -632,8 +644,6 @@ public:
             terr.rightMost = rightMost;
             terr.downMost = downMost;
 
-            // std::cout << "L:" << leftMost << ",R:" << rightMost << ", U:" << upMost << "D:" << downMost << std::endl;
-
             image.create(((rightMost*32)+16)-((leftMost*32)-16),((downMost*32)+16)-((upMost*32)-16),sf::Color::Transparent); // (0,0,0,100)
 
             sf::Image tileImage;
@@ -641,13 +651,78 @@ public:
 
             for(auto &pos : terr.territoryQuickList)
             {
-                image.copy(tileImage,(pos.x-leftMost)*32,(pos.y-upMost)*32);
-            }
+                int drawType = 4; // 1 = fill all tiles, 2 = fill only border tiles, 3 = lines on outer borders, 4 = overlay lines on outer borders
+                if(drawType == 1)
+                    image.copy(tileImage,(pos.x-leftMost)*32,(pos.y-upMost)*32);
+                if(drawType == 2)
+                {
+                    // If even one tile, even diagonal, isn't one of ours, draw.
+                    int nearCounts = 0;
+                    for(auto &near : terr.territoryQuickList)
+                        if(near.x == pos.x || near.x == pos.x-1 || near.x == pos.x+1)
+                            if(near.y == pos.y || near.y == pos.y-1 || near.y == pos.y+1)
+                                nearCounts++;
 
+
+                    if(nearCounts < 9)
+                        image.copy(tileImage,(pos.x-leftMost)*32,(pos.y-upMost)*32);
+                }
+                if(drawType == 3)
+                { // Just keeping this around for the cardinal logic.
+                    image.copy(tileImage,(pos.x-leftMost)*32,(pos.y-upMost)*32);
+
+                    bool N = false, NE = false, E = false, SE = false, S = false, SW = false, W = false, NW = false;
+                    for(auto &near : terr.territoryQuickList)
+                    {
+                        if(near.x == pos.x && near.y == pos.y-1)
+                            N = true;
+                        if(near.x == pos.x+1 && near.y == pos.y-1)
+                            NE = true;
+                        if(near.x == pos.x+1 && near.y == pos.y)
+                            E = true;
+                        if(near.x == pos.x+1 && near.y == pos.y+1)
+                            SE = true;
+                        if(near.x == pos.x && near.y == pos.y+1)
+                            S = true;
+                        if(near.x == pos.x-1 && near.y == pos.y+1)
+                            SW = true;
+                        if(near.x == pos.x-1 && near.y == pos.y)
+                            W = true;
+                        if(near.x == pos.x-1 && near.y == pos.y-1)
+                            NW = true;
+                    }
+                }
+
+                if(drawType == 4)
+                {
+                    bool N = false, E = false, S = false, W = false;
+                    for(auto &near : terr.territoryQuickList)
+                    {
+                        if(near.x == pos.x && near.y == pos.y-1)
+                            N = true;
+                        if(near.x == pos.x+1 && near.y == pos.y)
+                            E = true;
+                        if(near.x == pos.x && near.y == pos.y+1)
+                            S = true;
+                        if(near.x == pos.x-1 && near.y == pos.y)
+                            W = true;
+                    }
+
+                    { // 2 way/1 Edge
+                        if(!N)
+                            image.copy(border1N.copyToImage(),(pos.x-leftMost)*32,(pos.y-upMost)*32,sf::IntRect(),true);
+                        if(!E)
+                            image.copy(border1E.copyToImage(),(pos.x-leftMost)*32,(pos.y-upMost)*32,sf::IntRect(),true);
+                        if(!S)
+                            image.copy(border1S.copyToImage(),(pos.x-leftMost)*32,(pos.y-upMost)*32,sf::IntRect(),true);
+                        if(!W)
+                            image.copy(border1W.copyToImage(),(pos.x-leftMost)*32,(pos.y-upMost)*32,sf::IntRect(),true);
+                    }
+                }
+            }
             terr.texture.loadFromImage(image);
         }
     }
-
 };
 World world;
 
@@ -1188,6 +1263,7 @@ void renderWorld()
         sf::Sprite territorySprite;
         territorySprite.setTexture(terr.texture);
         territorySprite.setPosition(terr.leftMost*32,terr.upMost*32);
+        territorySprite.setColor(terr.borderColor);
         window.draw(territorySprite);
 
     }
