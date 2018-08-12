@@ -139,6 +139,7 @@ public:
     bool territoriesDoneGrowing = false;
     bool isLandClaimed = false;
     bool isWaterClaimed = false;
+    bool quickGrowTerritories = false;
     std::vector<std::vector<WorldTile>> tiles;
     std::list<Territory> territories;
 
@@ -842,6 +843,57 @@ public:
 };
 World world;
 
+bool growTerritories(bool skipGrowGraphics = false) // returns true when nothing more can be done.
+{
+    bool territoriesCanGrow;
+
+    if(!world.isLandClaimed)
+        territoriesCanGrow = world.growTerritories();
+    else
+        territoriesCanGrow = world.growTerritories(false);
+
+    if(!territoriesCanGrow && !world.isLandClaimed)
+    {
+        // std::cout << "Territories cannot grow any further. \n";
+        std::vector<sf::Vector2i> unclaimedLandLeft = world.getUnclaimedLand();
+        // std::cout << unclaimedLandLeft.size() << " viable land tiles remaining. "<< std::endl;
+        // std::cout << "Genning " << (unclaimedLandLeft.size()/10)+1 << " territories. \n";
+        if(unclaimedLandLeft.size() != 0)
+            world.genTerritories((unclaimedLandLeft.size()/10)+1,unclaimedLandLeft);
+        else
+        {
+            // std::cout << "The land has been claimed! \n";
+            world.genTerritories(10,world.getUnclaimedWater());
+            territoriesCanGrow = true;
+            // std::cout << "Victory. \n";
+        }
+    }
+    else if(!territoriesCanGrow && world.isLandClaimed && !world.isWaterClaimed)
+    {
+        // std::cout << "Territories cannot grow any further. \n";
+        std::vector<sf::Vector2i> unclaimedWaterLeft = world.getUnclaimedWater();
+        // std::cout << unclaimedWaterLeft.size() << " viable water tiles remaining. "<< std::endl;
+        // std::cout << "Genning " << (unclaimedWaterLeft.size()/100)+1 << " territories. \n";
+        if(unclaimedWaterLeft.size() != 0)
+            world.genTerritories((unclaimedWaterLeft.size()/100)+1,unclaimedWaterLeft);
+        else
+        {
+            // std::cout << "The water has been claimed! \n";
+        }
+
+    }
+    if(world.isLandClaimed && world.isWaterClaimed) // Nothing more to do, so return true.
+    {
+        std::cout << "* The world has been claimed! * \n";
+        return true;
+    }
+
+    if(!skipGrowGraphics)
+        world.buildTerritoryImages();
+
+    return false; // There's more to do.
+}
+
 class WorldMenu
 {
 public:
@@ -860,6 +912,9 @@ public:
     sfg::Entry::Ptr seedEntry;
     sfg::Button::Ptr setSeed_button;
     sfg::Label::Ptr currentSeedLabel;
+    // Territory/Region stuffs
+    sfg::Button::Ptr instantRegion_button;
+    sfg::ToggleButton::Ptr toggleRegionGrowth_button;
 
 
 
@@ -977,12 +1032,57 @@ public:
         hbox3->Pack( setSeedRan_button, false );
         hbox3->Pack( currentSeedLabel, false );
 
+        auto hbox0 = sfg::Box::Create( sfg::Box::Orientation::HORIZONTAL, 5 );
+        auto geographyLabel = sfg::Label::Create("*Geography Settings*");
+        hbox0->Pack( geographyLabel, false );
         auto vbox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 5 );
+        vbox->Pack( hbox0, false );
         vbox->Pack( hbox, false );
         vbox->Pack( hbox2, false );
         vbox->Pack( hbox3, false );
 
-        // vbox->Pack( sel_label, true );
+
+        // *== Region/Territory Section
+        auto hboxTerritory0 = sfg::Box::Create( sfg::Box::Orientation::HORIZONTAL, 5 );
+        auto regionLabel = sfg::Label::Create("*Region Settings*");
+        hboxTerritory0->Pack( regionLabel, false );
+        vbox->Pack( hboxTerritory0, false );
+
+        auto hboxTerritory1 = sfg::Box::Create( sfg::Box::Orientation::HORIZONTAL, 5 );
+        vbox->Pack( hboxTerritory1, false );
+
+        toggleRegionGrowth_button = sfg::ToggleButton::Create( "Grow Regions" );
+
+        toggleRegionGrowth_button->GetSignal( sfg::ToggleButton::OnToggle ).Connect( [&] {
+            if( toggleRegionGrowth_button->IsActive() ) {
+                if(world.territories.empty())
+                    world.genTerritories();
+                world.quickGrowTerritories = true;
+                std::cout << "True \n";
+            }
+            else {
+                world.quickGrowTerritories = false;
+                std::cout << "False \n";
+            }
+        } );
+        hboxTerritory1->Pack( toggleRegionGrowth_button, false );
+
+        instantRegion_button = sfg::Button::Create( L"Instant(Skip)" );
+        instantRegion_button->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&] {
+            if(world.territories.empty())
+                world.genTerritories();
+            bool doneGrowing = false;
+            while(!doneGrowing)
+            {
+                doneGrowing = growTerritories(true);
+                world.buildTerritoryImages();
+            }
+        } );
+        hboxTerritory1->Pack( instantRegion_button, false );
+
+
+
+
 
         // Add the combo box to the window
         sfGuiwindow->Add( vbox );
@@ -1433,11 +1533,16 @@ void evolveWorld()
 
 }
 
+
 void evolveTerritories()
 {
     if(inputState.key[Key::Q].time == 1)
         world.genTerritories();
-    if(inputState.key[Key::W].time == 1 || inputState.key[Key::W].time >= 60 )
+
+    if(world.quickGrowTerritories)
+        growTerritories();
+
+    if(inputState.key[Key::W].time == 1 || inputState.key[Key::W].time >= 60)
     {
 
         bool territoriesCanGrow;
@@ -1450,7 +1555,6 @@ void evolveTerritories()
         if(!territoriesCanGrow && !world.isLandClaimed)
         {
             // std::cout << "Territories cannot grow any further. \n";
-
             std::vector<sf::Vector2i> unclaimedLandLeft = world.getUnclaimedLand();
             // std::cout << unclaimedLandLeft.size() << " viable land tiles remaining. "<< std::endl;
             // std::cout << "Genning " << (unclaimedLandLeft.size()/10)+1 << " territories. \n";
@@ -1458,27 +1562,26 @@ void evolveTerritories()
                 world.genTerritories((unclaimedLandLeft.size()/10)+1,unclaimedLandLeft);
             else
             {
-
-                std::cout << "The land has been claimed! \n";
+                // std::cout << "The land has been claimed! \n";
                 world.genTerritories(10,world.getUnclaimedWater());
                 territoriesCanGrow = true;
-                std::cout << "Victory. \n";
+                // std::cout << "Victory. \n";
             }
 
         }
         else if(!territoriesCanGrow && world.isLandClaimed && !world.isWaterClaimed)
         {
-            std::cout << "Territories cannot grow any further. \n";
-
+            // std::cout << "Territories cannot grow any further. \n";
             std::vector<sf::Vector2i> unclaimedWaterLeft = world.getUnclaimedWater();
-            std::cout << unclaimedWaterLeft.size() << " viable water tiles remaining. "<< std::endl;
-            std::cout << "Genning " << (unclaimedWaterLeft.size()/100)+1 << " territories. \n";
+            // std::cout << unclaimedWaterLeft.size() << " viable water tiles remaining. "<< std::endl;
+            // std::cout << "Genning " << (unclaimedWaterLeft.size()/100)+1 << " territories. \n";
             if(unclaimedWaterLeft.size() != 0)
                 world.genTerritories((unclaimedWaterLeft.size()/100)+1,unclaimedWaterLeft);
             else
             {
-                std::cout << "The water has been claimed! \n";
+                // std::cout << "The water has been claimed! \n";
             }
+
         }
         if(world.isLandClaimed && world.isWaterClaimed)
             std::cout << "* The world has been claimed! * \n";
