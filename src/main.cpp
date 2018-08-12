@@ -63,7 +63,7 @@ public:
         water = true;
         buildable = false;
         mountain = false;
-        territoryGrowthRate = 10;
+        territoryGrowthRate = 1;
     }
     void makeDirt()
     {
@@ -100,7 +100,8 @@ class Territory
 {
 public:
     sf::Texture texture;
-    bool canGrow;
+    bool canGrow = true;
+    bool imageComplete = false;
     int leftMost, upMost, rightMost, downMost;
 
     std::string name;
@@ -136,6 +137,8 @@ public:
     int id;
     int seed;
     bool territoriesDoneGrowing = false;
+    bool isLandClaimed = false;
+    bool isWaterClaimed = false;
     std::vector<std::vector<WorldTile>> tiles;
     std::list<Territory> territories;
 
@@ -501,12 +504,14 @@ public:
             }
             else
             {
-                while(validStake == false)
+                while(validStake == false && failSafe < 100)
                 {
+                    failSafe++; // This is to prevent infinite loops.
+                    if(failSafe == 90)
+                        std::cout << "*WARNING* GenTerritories failsafe hit 90 attempts \n";
+
                     sf::Vector2i workPlot;
                     workPlot = unstakedTiles[random(0,unstakedTiles.size()-1)];
-                    if(tiles[workPlot.x][workPlot.y].buildable == false)
-                        continue;
                     if(isPlotTaken(workPlot))
                         continue;
 
@@ -546,10 +551,32 @@ public:
                 returnList.push_back(workPlot);
         }
 
+        if(returnList.size() == 0)
+            isLandClaimed = true;
+
         return returnList;
     }
 
-    bool growTerritories() // Returns true if territories can keep growing
+    std::vector<sf::Vector2i> getUnclaimedWater()
+    {
+        std::vector<sf::Vector2i> returnList;
+        for(int i = 0; i != tiles.size(); i++)
+            for(int t = 0; t != tiles[i].size(); t++)
+        {
+            sf::Vector2i workPlot(i,t);
+            if(!isPlotTaken(workPlot))
+                if(tiles[i][t].type == 1) // If type is water.
+                    returnList.push_back(workPlot);
+        }
+
+        if(returnList.size() == 0)
+            isWaterClaimed = true;
+
+        return returnList;
+    }
+
+
+    bool growTerritories(bool careAboutBuildable = true) // Returns true if territories can keep growing
     {
         int stagnantTerritories = 0;
         for(auto &terr : territories)
@@ -573,25 +600,51 @@ public:
                 bool downClear = false;
                 { // JIC Surrounded check
 
-                    if(ourPos.x != 0 && isPlotViable(tiles[ourPos.x-1][ourPos.y].pos))
+                    if(careAboutBuildable)
                     {
-                        areWeSurrounded = false;
-                        leftClear = true;
+                        if(ourPos.x != 0 && isPlotViable(tiles[ourPos.x-1][ourPos.y].pos))
+                        {
+                            areWeSurrounded = false;
+                            leftClear = true;
+                        }
+                        if(ourPos.x != tiles.size()-1 && isPlotViable(tiles[ourPos.x+1][ourPos.y].pos))
+                        {
+                            rightClear = true;
+                            areWeSurrounded = false;
+                        }
+                        if(ourPos.y != 0 && isPlotViable(tiles[ourPos.x][ourPos.y-1].pos))
+                        {
+                            upClear = true;
+                            areWeSurrounded = false;
+                        }
+                        if(ourPos.y != tiles.size()-1 && isPlotViable(tiles[ourPos.x][ourPos.y+1].pos))
+                        {
+                            downClear = true;
+                            areWeSurrounded = false;
+                        }
                     }
-                    if(ourPos.x != tiles.size()-1 && isPlotViable(tiles[ourPos.x+1][ourPos.y].pos))
+                    else
                     {
-                        rightClear = true;
-                        areWeSurrounded = false;
-                    }
-                    if(ourPos.y != 0 && isPlotViable(tiles[ourPos.x][ourPos.y-1].pos))
-                    {
-                        upClear = true;
-                        areWeSurrounded = false;
-                    }
-                    if(ourPos.y != tiles.size()-1 && isPlotViable(tiles[ourPos.x][ourPos.y+1].pos))
-                    {
-                        downClear = true;
-                        areWeSurrounded = false;
+                        if(ourPos.x != 0 && !isPlotTaken(tiles[ourPos.x-1][ourPos.y].pos))
+                        {
+                            areWeSurrounded = false;
+                            leftClear = true;
+                        }
+                        if(ourPos.x != tiles.size()-1 && !isPlotTaken(tiles[ourPos.x+1][ourPos.y].pos))
+                        {
+                            rightClear = true;
+                            areWeSurrounded = false;
+                        }
+                        if(ourPos.y != 0 && !isPlotTaken(tiles[ourPos.x][ourPos.y-1].pos))
+                        {
+                            upClear = true;
+                            areWeSurrounded = false;
+                        }
+                        if(ourPos.y != tiles.size()-1 && !isPlotTaken(tiles[ourPos.x][ourPos.y+1].pos))
+                        {
+                            downClear = true;
+                            areWeSurrounded = false;
+                        }
                     }
 
                 }
@@ -637,7 +690,11 @@ public:
             }
 
             if(!canGrowMore)
+            {
                 stagnantTerritories++;
+                terr.canGrow = false;
+            }
+
 
         }
         // if(stagnantTerritories > 0)
@@ -668,6 +725,9 @@ public:
 
         for(auto &terr : territories)
         {
+            if(terr.imageComplete) // We're done with this territory.
+                continue;
+
             sf::Image image;
             // First, we figure out our bounds, left, up, right, down. This will be our image size.
             int leftMost, upMost, rightMost, downMost;
@@ -773,6 +833,10 @@ public:
                 }
             }
             terr.texture.loadFromImage(image);
+
+            if(!terr.canGrow)
+                terr.imageComplete = true;
+
         }
     }
 };
@@ -954,6 +1018,8 @@ public:
             currentSeedLabel->SetText(std::to_string(world.seed));
             buildChunkImage();
             world.territories.clear();
+            world.isLandClaimed = false;
+            world.isWaterClaimed = false;
         } );
 
         sfGuiwindow->Update( 0.f );
@@ -1371,10 +1437,17 @@ void evolveTerritories()
 {
     if(inputState.key[Key::Q].time == 1)
         world.genTerritories();
-    if(inputState.key[Key::W].time == 1)
+    if(inputState.key[Key::W].time == 1 || inputState.key[Key::W].time >= 60 )
     {
-        bool territoriesCanGrow = world.growTerritories();
-        if(!territoriesCanGrow)
+
+        bool territoriesCanGrow;
+
+        if(!world.isLandClaimed)
+            territoriesCanGrow = world.growTerritories();
+        else
+            territoriesCanGrow = world.growTerritories(false);
+
+        if(!territoriesCanGrow && !world.isLandClaimed)
         {
             // std::cout << "Territories cannot grow any further. \n";
 
@@ -1384,10 +1457,33 @@ void evolveTerritories()
             if(unclaimedLandLeft.size() != 0)
                 world.genTerritories((unclaimedLandLeft.size()/10)+1,unclaimedLandLeft);
             else
-                std::cout << "The land has been claimed! \n";
-        }
+            {
 
-        world.buildTerritoryImages();
+                std::cout << "The land has been claimed! \n";
+                world.genTerritories(10,world.getUnclaimedWater());
+                territoriesCanGrow = true;
+                std::cout << "Victory. \n";
+            }
+
+        }
+        else if(!territoriesCanGrow && world.isLandClaimed && !world.isWaterClaimed)
+        {
+            std::cout << "Territories cannot grow any further. \n";
+
+            std::vector<sf::Vector2i> unclaimedWaterLeft = world.getUnclaimedWater();
+            std::cout << unclaimedWaterLeft.size() << " viable water tiles remaining. "<< std::endl;
+            std::cout << "Genning " << (unclaimedWaterLeft.size()/100)+1 << " territories. \n";
+            if(unclaimedWaterLeft.size() != 0)
+                world.genTerritories((unclaimedWaterLeft.size()/100)+1,unclaimedWaterLeft);
+            else
+            {
+                std::cout << "The water has been claimed! \n";
+            }
+        }
+        if(world.isLandClaimed && world.isWaterClaimed)
+            std::cout << "* The world has been claimed! * \n";
+        if(!inputState.key[Key::G])
+            world.buildTerritoryImages();
     }
 
 
