@@ -1228,8 +1228,8 @@ public:
             while(!doneGrowing)
             {
                 doneGrowing = growTerritories(true);
-                world.buildTerritoryImages();
             }
+            world.buildTerritoryImages();
         } );
         hboxTerritory1->Pack( instantRegion_button, false );
 
