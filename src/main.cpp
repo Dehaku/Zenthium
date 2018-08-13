@@ -20,29 +20,133 @@ class Globals
 {
 public:
     unsigned int globalID;
+
+    RandomWeightList RWLRace;
+
     Globals()
     {
         globalID = 100;
+        RWLRace.addEntry("Normie",8000);
+        RWLRace.addEntry("Mutant",1000);
+        RWLRace.addEntry("Mystic",800);
+        RWLRace.addEntry("Super",100);
+        RWLRace.addEntry("Alien",100);
+        RWLRace.addEntry("Legendary",1);
     }
 };
 Globals globals;
+
+class Talent // Traits, Abilities, Spells, Powers.
+{
+public:
+    std::string name;
+    BigInteger potency;
+    BigInteger zenthiumInfused;
+    BigInteger damage;
+    BigInteger staminaCost;
+
+    bool allowNormie;
+    bool allowMutant;
+    bool allowMystic;
+    bool allowSuper;
+    bool allowLegendary; // (Secret)
+
+    Talents()
+    {
+        int randomTalent = random(1,10);
+        if(randomTalent == 1)
+            name = "Super Strength";
+        if(randomTalent == 2)
+            name = "Super Speed";
+        if(randomTalent == 3)
+            name = "Invicibility";
+        if(randomTalent == 4)
+            name = "Telepathy";
+        if(randomTalent == 5)
+            name = "Flight";
+        if(randomTalent == 6)
+            name = "Telekinesis";
+        if(randomTalent == 7)
+            name = "Mythical Martial Artist";
+        if(randomTalent == 8)
+            name = "Super Intelligent";
+        if(randomTalent == 9)
+            name = "Laser Eyes";
+        if(randomTalent == 10)
+            name = "Shapeshifter";
+    }
+};
 
 class Creature
 {
 public:
     unsigned int id;
     std::string name;
+    unsigned int age;
+    short type; // 1 = Normie, 2 = Mutant, 3 = Mystic, 4 = Super, 5 = Alien, 6 = Legendary(Secret)
+    sf::Vector2i worldPos; // Based on the grid.
 
+    // Stats
+    BigInteger healthMax;
+    BigInteger healthCap;
+    BigInteger health;
+
+    BigInteger staminaMax;
+    BigInteger staminaCap;
+    BigInteger stamina;
+
+    BigInteger painMax;
+    BigInteger painCap;
+    BigInteger pain;
+
+    int hungerMax; // 0-100, Non-lethal if empty, speed and morale penalties.
+    int hunger;
+
+    int thirstMax; // 0-100 Lethal if empty.
+    int thirst;
+
+    int happinessMax; // 0-100, soft cap. Bonuses upon growing past.
+    int happiness;
+
+    // Attributes and Skills
     BigInteger agility;
     BigInteger strength;
     BigInteger speed;
     BigInteger endurance;
     BigInteger skill;
 
+    // Personality, These act as sliders to determine a creatures personality, they range from -100 to 100.
+    int Caring_Aloof; // Affects how much most of the other traits apply.
+    int Bright_Brooding; // Happy go lucky - doom and gloom.
+    int Calm_Excitable; // Reserved and Quiet - Loud and Rambly
+    int Greedy_Generous; // Takes for themselves - Allows or gives to others
+    int Cruel_Merciful; // Enjoys causing pain - Prefers to reduce pain
+    int Crude_Elegant; // Does it - Does it with style, alternatively, how much they care about how they're perceived.
+    int Secrecy_Openness; // How much they want their actions and associations hidden.
+    int Disbelief_Honor; // How much they care about a faction's law/ethics system. A.K.A. Chaotic vs Lawful
+
+    std::list<Talent> talents;
+
+    BigInteger getTotalZenthiumInfused()
+    {
+        BigInteger returnValue;
+        return returnValue;
+    }
+
     Creature()
     {
         id = globals.globalID++;
-        name = "Jackson";
+        name = generateName();
+        type = globals.RWLRace.getRandomSlot()+1;
+        if(type != 0)
+        {
+            for(int i = 0; i != 3; i++)
+            {
+                Talent talent;
+                talent.zenthiumInfused = random(10,100);
+                talents.push_back(talent);
+            }
+        }
     }
 };
 
@@ -142,6 +246,9 @@ public:
     bool quickGrowTerritories = false;
     std::vector<std::vector<WorldTile>> tiles;
     std::list<Territory> territories;
+    std::list<std::shared_ptr<Creature>> genPop;
+    std::list<std::shared_ptr<Creature>> deadPop;
+    int initialPopulation = 10000;
 
     void genWorld()
     {
@@ -838,6 +945,52 @@ public:
             if(!terr.canGrow)
                 terr.imageComplete = true;
 
+        }
+    }
+
+    int getPopTypeCount(int popType)
+    {
+        int returnValue = 0;
+        for(auto &agent : genPop)
+        {
+            if(!agent.get())
+            {
+                std::cout << "Failed to get\n";
+                continue;
+            }
+            if(agent->type == popType)
+                returnValue++;
+        }
+
+        return returnValue;
+    }
+
+
+    void genPopReadout()
+    {
+        int normies = getPopTypeCount(1);
+        int mutants = getPopTypeCount(2);
+        int mystics = getPopTypeCount(3);
+        int supers = getPopTypeCount(4);
+        int aliens = getPopTypeCount(5);
+        int legendaries = getPopTypeCount(6); // (Secret)
+        std::cout << "=Pop Readout= \n";
+        std::cout << "Normies: " << normies << std::endl;
+        std::cout << "Mutants: " << mutants << std::endl;
+        std::cout << "Mystics: " << mystics << std::endl;
+        std::cout << "Supers: " << supers << std::endl;
+        std::cout << "Aliens: " << aliens << std::endl;
+        if(legendaries > 0)
+            std::cout << "Legendaries: " << legendaries << std::endl;
+    }
+
+    void generateGeneralPopulation()
+    {
+        for(int i = 0; i != initialPopulation; i++)
+        {
+            std::shared_ptr<Creature> agent = std::make_shared<Creature>();
+            // Creature* charPtr = creature.get();
+            genPop.push_back(agent);
         }
     }
 };
@@ -1637,7 +1790,13 @@ void setup()
 
     buildChunkImage();
     std::cout << "World Image:" << clock.getElapsedTime().asMicroseconds() << std::endl;
+
+    clock.restart();
+    world.generateGeneralPopulation();
+    std::cout << "Generating General Population:" << clock.getElapsedTime().asMicroseconds() << std::endl;
     // ==World Gen End==
+    world.genPopReadout();
+
 }
 
 void loop()
