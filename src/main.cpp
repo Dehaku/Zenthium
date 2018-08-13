@@ -1186,23 +1186,35 @@ public:
         hbox3->Pack( currentSeedLabel, false );
 
         auto hbox0 = sfg::Box::Create( sfg::Box::Orientation::HORIZONTAL, 5 );
-        auto geographyLabel = sfg::Label::Create("*Geography Settings*");
-        hbox0->Pack( geographyLabel, false );
         auto vbox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 5 );
         vbox->Pack( hbox0, false );
         vbox->Pack( hbox, false );
         vbox->Pack( hbox2, false );
         vbox->Pack( hbox3, false );
 
+        auto mainvbox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 5 );
+        auto geographyFrame = sfg::Frame::Create( "Geography Settings" );
+        geographyFrame->Add(vbox);
+        mainvbox->Pack(geographyFrame);
+
 
         // *== Region/Territory Section
+        auto regionvbox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 5 );
+        auto regionFrame = sfg::Frame::Create( "Region Settings" );
+
         auto hboxTerritory0 = sfg::Box::Create( sfg::Box::Orientation::HORIZONTAL, 5 );
         auto regionLabel = sfg::Label::Create("*Region Settings*");
-        hboxTerritory0->Pack( regionLabel, false );
-        vbox->Pack( hboxTerritory0, false );
+        //hboxTerritory0->Pack( regionLabel, false );
+        //frame->Add(hboxTerritory0);
+
+        //vbox->Pack( hboxTerritory0, false );
 
         auto hboxTerritory1 = sfg::Box::Create( sfg::Box::Orientation::HORIZONTAL, 5 );
-        vbox->Pack( hboxTerritory1, false );
+        // vbox->Pack( hboxTerritory1, false );
+        regionFrame->Add(hboxTerritory1);
+        regionvbox->Pack( regionFrame, false);
+
+        mainvbox->Pack(regionvbox);
 
         toggleRegionGrowth_button = sfg::ToggleButton::Create( "Grow Regions" );
 
@@ -1238,7 +1250,7 @@ public:
 
 
         // Add the combo box to the window
-        sfGuiwindow->Add( vbox );
+        sfGuiwindow->Add( mainvbox );
 
         combo_box->GetSignal( sfg::ComboBox::OnSelect ).Connect( [&] {
         if(combo_box->GetSelectedItem() == 0 || combo_box->GetSelectedItem() == 6)
