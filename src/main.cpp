@@ -1047,6 +1047,8 @@ bool growTerritories(bool skipGrowGraphics = false) // returns true when nothing
     return false; // There's more to do.
 }
 
+
+
 class WorldMenu
 {
 public:
@@ -1295,7 +1297,8 @@ public:
         sfGuiwindow = sfg::Window::Create();
     }
 };
-WorldMenu worldMenu;
+std::list<std::shared_ptr<WorldMenu>> worldMenus;
+// WorldMenu worldMenu;
 
 
 
@@ -1827,6 +1830,15 @@ void loop()
     fpsKeeper.calcFPS();
     std::string fpsText = "FPS: " + std::to_string((int)fpsKeeper.framesPerSecond);
     shapes.createText(5,5,30,sf::Color::White,fpsText, &gvars::hudView); // window.getView()
+
+    if(inputState.key[Key::K].time == 1)
+    {
+        std::shared_ptr<WorldMenu> worldMenu = std::make_shared<WorldMenu>();
+        worldMenus.push_back(worldMenu);
+        worldMenus.back().get()->buildMenu();
+    }
+    if(inputState.key[Key::L].time == 1)
+        worldMenus.clear();
 }
 
 // Create the main window
@@ -1894,7 +1906,8 @@ int main()
 
 	// attributesMenu.sfGuiwindow->SetTitle( "Zenthium" );
 	// attributesMenu.buildMenu();
-	worldMenu.buildMenu();
+
+	// worldMenu.buildMenu();
 
 
 
@@ -1922,7 +1935,8 @@ int main()
             inputState.updateFromEvent(event);
             // Handle events
 			//attributesMenu.sfGuiwindow->HandleEvent( event );
-			worldMenu.sfGuiwindow->HandleEvent( event );
+			for(auto &menu : worldMenus)
+                menu.get()->sfGuiwindow->HandleEvent( event );
             // Close window : exit
             if (event.type == sf::Event::Closed)
                 window.close();
@@ -1950,7 +1964,8 @@ int main()
         // Update the GUI every 5ms
 		if( clock.getElapsedTime().asMicroseconds() >= 5000 ) {
 			// Update() takes the elapsed time in seconds.
-			worldMenu.sfGuiwindow->Update( static_cast<float>( clock.getElapsedTime().asMicroseconds() ) / 1000000.f );
+			for(auto &menu : worldMenus)
+                menu.get()->sfGuiwindow->Update( static_cast<float>( clock.getElapsedTime().asMicroseconds() ) / 1000000.f );
 
 			clock.restart();
 		}
