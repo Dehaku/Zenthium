@@ -130,6 +130,10 @@ public:
     BigInteger getTotalZenthiumInfused()
     {
         BigInteger returnValue;
+
+        for(auto &talent : talents)
+            returnValue += talent.zenthiumInfused;
+
         return returnValue;
     }
 
@@ -138,7 +142,7 @@ public:
         id = globals.globalID++;
         name = generateName();
         type = globals.RWLRace.getRandomSlot()+1;
-        if(type != 0)
+        if(type != 1)
         {
             for(int i = 0; i != 3; i++)
             {
@@ -1298,7 +1302,102 @@ public:
     }
 };
 std::list<std::shared_ptr<WorldMenu>> worldMenus;
-// WorldMenu worldMenu;
+
+class GenPopMenu
+{
+public:
+    sfg::Window::Ptr sfGuiwindow;
+    sfg::Label::Ptr sel_label;
+    sfg::Box::Ptr scrolled_window_box;
+    sfg::ScrolledWindow::Ptr scrolledwindow;
+
+    void buildMenu()
+    {
+        sfGuiwindow->SetTitle( "General Population" );
+
+        auto mainBox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 10.f );
+        scrolled_window_box = sfg::Box::Create( sfg::Box::Orientation::VERTICAL );
+
+        auto button = sfg::Button::Create( "Add a button" );
+        button->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&] { scrolled_window_box->Pack( sfg::Button::Create( "A Button" ) ); } );
+
+        int devCounter = 0;
+        sf::Clock clocker;
+        clocker.restart();
+        for(auto &agent : world.genPop)
+        {
+            devCounter++;
+            if(devCounter > 100)
+                break;
+            std::string agentName;
+            std::string agentType;
+            std::string agentZen;
+            agentName.append(agent->name);
+
+            agentType.append("Type: ");
+            {
+                if(agent->type == 1)
+                    agentType.append("Normie");
+                if(agent->type == 2)
+                    agentType.append("Mutant");
+                if(agent->type == 3)
+                    agentType.append("Mystic");
+                if(agent->type == 4)
+                    agentType.append("Super");
+                if(agent->type == 5)
+                    agentType.append("Alien");
+                if(agent->type == 6)
+                    agentType.append("Legendary"); // (Secret)
+            }
+            agentZen.append("Zen: ");
+            agentZen.append(std::to_string(agent->getTotalZenthiumInfused().toInt()));
+
+
+            auto agentNameLabel = sfg::Label::Create(agentName);
+            auto fixedNameLabel = sfg::Fixed::Create();
+            fixedNameLabel->Put(agentNameLabel,sf::Vector2f(5,0));
+
+            auto agentTypeLabel = sfg::Label::Create(agentType);
+            auto fixedTypeLabel = sfg::Fixed::Create();
+            fixedTypeLabel->Put(agentTypeLabel,sf::Vector2f(70,0));
+
+            auto agentZenLabel = sfg::Label::Create(agentZen);
+            auto fixedZenLabel = sfg::Fixed::Create();
+            fixedZenLabel->Put(agentZenLabel,sf::Vector2f(50,0));
+
+            auto hbox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL);
+
+            hbox->Pack( fixedNameLabel );
+            hbox->Pack( fixedTypeLabel );
+            hbox->Pack( fixedZenLabel );
+
+            scrolled_window_box->Pack( hbox );
+        }
+        std::cout << "T: " << clocker.getElapsedTime().asMicroseconds() << std::endl;
+
+        scrolledwindow = sfg::ScrolledWindow::Create();
+        scrolledwindow->SetScrollbarPolicy( sfg::ScrolledWindow::HORIZONTAL_ALWAYS | sfg::ScrolledWindow::VERTICAL_AUTOMATIC );
+
+        scrolledwindow->AddWithViewport( scrolled_window_box );
+        scrolledwindow->SetRequisition( sf::Vector2f( 500.f, 100.f ) );
+
+
+        mainBox->Pack( button, false, true );
+        mainBox->Pack( scrolledwindow, true, true );
+
+        // Add the box to the window.
+        sfGuiwindow->Add( mainBox );
+
+
+        sfGuiwindow->Update( 0.f );
+    }
+
+    GenPopMenu()
+    {
+        sfGuiwindow = sfg::Window::Create();
+    }
+};
+std::list<std::shared_ptr<GenPopMenu>> genPopMenus;
 
 
 
@@ -1837,8 +1936,20 @@ void loop()
         worldMenus.push_back(worldMenu);
         worldMenus.back().get()->buildMenu();
     }
+
+    if(inputState.key[Key::I].time == 1)
+    {
+        std::shared_ptr<GenPopMenu> genPopMenu = std::make_shared<GenPopMenu>();
+        genPopMenus.push_back(genPopMenu);
+        genPopMenus.back().get()->buildMenu();
+    }
+
     if(inputState.key[Key::L].time == 1)
+    {
         worldMenus.clear();
+        genPopMenus.clear();
+    }
+
 }
 
 // Create the main window
@@ -1937,6 +2048,9 @@ int main()
 			//attributesMenu.sfGuiwindow->HandleEvent( event );
 			for(auto &menu : worldMenus)
                 menu.get()->sfGuiwindow->HandleEvent( event );
+
+            for(auto &menu : genPopMenus)
+                menu.get()->sfGuiwindow->HandleEvent( event );
             // Close window : exit
             if (event.type == sf::Event::Closed)
                 window.close();
@@ -1967,6 +2081,9 @@ int main()
 			for(auto &menu : worldMenus)
                 menu.get()->sfGuiwindow->Update( static_cast<float>( clock.getElapsedTime().asMicroseconds() ) / 1000000.f );
 
+            for(auto &menu : genPopMenus)
+                menu.get()->sfGuiwindow->Update( static_cast<float>( clock.getElapsedTime().asMicroseconds() ) / 1000000.f );
+
 			clock.restart();
 		}
 
@@ -1977,7 +2094,11 @@ int main()
         shapes.drawShapes();
         AnyDeletes(shapes.shapes);
         // Draw the GUI
+        sf::Clock clocker;
+        clocker.restart();
 		sfgui.Display( window );
+		if(inputState.key[Key::O].time == 1)
+            std::cout << "SFGui Clocker: " << clocker.getElapsedTime().asMicroseconds() << std::endl;
 
         // Update the window
         window.display();
