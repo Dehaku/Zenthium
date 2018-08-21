@@ -1310,25 +1310,109 @@ public:
     sfg::Label::Ptr sel_label;
     sfg::Box::Ptr scrolled_window_box;
     sfg::ScrolledWindow::Ptr scrolledwindow;
+    sfg::Label::Ptr page_label;
+
+    bool needsRefresh = false;
+    int pageStart = 0; // We only show 100 entries at a time.
+
+    std::vector<std::shared_ptr<Creature>> genPopVector;
+
+    void sortie()
+    {
+
+      /*
+        std::vector<Shape> &num = shapes;
+    int i, flag = 1, numLength = num.size();
+    Shape tempShape;
+    int d = numLength;
+    while( flag || (d > 1))      // boolean flag (true when not equal to 0)
+    {
+        flag = 0;           // reset flag to 0 to check for future swaps
+        d = (d+1) / 2;
+        for (i = 0; i < (numLength - d); i++)
+        {
+            if (num[i + d].layer < num[i].layer)
+            {
+                tempShape = num[i + d];      // swap positions i+d and i
+                num[i + d] = num[i];
+                num[i] = tempShape;
+                flag = 1;                  // tells swap has occurred
+            }
+        }
+    }
+    */
+
+    }
 
     void buildMenu()
     {
         sfGuiwindow->SetTitle( "General Population" );
 
-        auto mainBox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 10.f );
-        scrolled_window_box = sfg::Box::Create( sfg::Box::Orientation::VERTICAL );
-
-        auto button = sfg::Button::Create( "Add a button" );
-        button->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&] { scrolled_window_box->Pack( sfg::Button::Create( "A Button" ) ); } );
-
-        int devCounter = 0;
         sf::Clock clocker;
         clocker.restart();
         for(auto &agent : world.genPop)
+            genPopVector.push_back(agent);
+
+        std::cout << "T: " << clocker.getElapsedTime().asMicroseconds() << std::endl;
+
+
+        auto mainBox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 10.f );
+        scrolled_window_box = sfg::Box::Create( sfg::Box::Orientation::VERTICAL );
+
+        auto sortNameButton = sfg::Button::Create( "Sort-Name" );
+        sortNameButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+        {
+            scrolled_window_box->Pack( sfg::Button::Create( "A Button" ) );
+        } );
+
+        auto sortTypeButton = sfg::Button::Create( "Sort-Type" );
+        sortTypeButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+        {
+
+            std::vector<std::shared_ptr<Creature>> &num = genPopVector;
+            int i, flag = 1, numLength = num.size();
+            std::shared_ptr<Creature> tempShape;
+            int d = numLength;
+            while( flag || (d > 1))      // boolean flag (true when not equal to 0)
+            {
+                flag = 0;           // reset flag to 0 to check for future swaps
+                d = (d+1) / 2;
+                for (i = 0; i < (numLength - d); i++)
+                {
+                    if (num[i + d]->type < num[i]->type)
+                    {
+                        tempShape = num[i + d];      // swap positions i+d and i
+                        num[i + d] = num[i];
+                        num[i] = tempShape;
+                        flag = 1;                  // tells swap has occurred
+                    }
+                }
+            }
+
+            needsRefresh = true;
+
+
+
+            // scrolled_window_box->Pack( sfg::Button::Create( "A Button" ) );
+        } );
+
+        auto sortZenButton = sfg::Button::Create( "Sort-Zen" );
+        sortZenButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+        {
+            scrolled_window_box->Pack( sfg::Button::Create( "A Button" ) );
+        } );
+
+        int devCounter = 0;
+        clocker.restart();
+        for(auto &agent : genPopVector)
         {
             devCounter++;
-            if(devCounter > 100)
+            if(devCounter < pageStart)
+                continue;
+            if(devCounter > pageStart+99)
                 break;
+
+
             std::string agentName;
             std::string agentType;
             std::string agentZen;
@@ -1382,9 +1466,74 @@ public:
         scrolledwindow->SetRequisition( sf::Vector2f( 500.f, 100.f ) );
 
 
-        mainBox->Pack( button, false, true );
-        mainBox->Pack( scrolledwindow, true, true );
+        auto buttonBox = sfg::Box::Create();
+        buttonBox->Pack(sortNameButton);
+        buttonBox->Pack(sortTypeButton);
+        buttonBox->Pack(sortZenButton);
 
+        auto pageButtonBox = sfg::Box::Create();
+
+        auto pageExtremeLeftButton = sfg::Button::Create( "<<<" );
+        pageExtremeLeftButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+        {
+            if(pageStart > 900)
+            {
+                pageStart -= 1000;
+                page_label->SetText(std::to_string(pageStart) + " - " + std::to_string(pageStart+100));
+                needsRefresh = true;
+            }
+
+        } );
+
+        auto pageLeftButton = sfg::Button::Create( "<" );
+        pageLeftButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+        {
+            if(pageStart > 0)
+            {
+                pageStart -= 100;
+                page_label->SetText(std::to_string(pageStart) + " - " + std::to_string(pageStart+100));
+                needsRefresh = true;
+            }
+
+        } );
+
+        auto pageText_label = sfg::Label::Create("Page: ");
+
+        page_label = sfg::Label::Create(std::to_string(pageStart) + " - " + std::to_string(pageStart+100));
+
+        auto pageRightButton = sfg::Button::Create( ">" );
+        pageRightButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+        {
+            if(pageStart < world.genPop.size()-100)
+            {
+                pageStart += 100;
+                page_label->SetText(std::to_string(pageStart) + " - " + std::to_string(pageStart+100));
+                needsRefresh = true;
+            }
+        } );
+
+        auto pageExtremeRightButton = sfg::Button::Create( ">>>" );
+        pageExtremeRightButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+        {
+            if(pageStart < world.genPop.size()-1000)
+            {
+                pageStart += 1000;
+                page_label->SetText(std::to_string(pageStart) + " - " + std::to_string(pageStart+100));
+                needsRefresh = true;
+            }
+        } );
+
+        pageButtonBox->Pack(pageExtremeLeftButton);
+        pageButtonBox->Pack(pageLeftButton);
+        pageButtonBox->Pack(pageText_label);
+        pageButtonBox->Pack(page_label);
+        pageButtonBox->Pack(pageRightButton);
+        pageButtonBox->Pack(pageExtremeRightButton);
+
+
+        mainBox->Pack( buttonBox, false, true );
+        mainBox->Pack( scrolledwindow, true, true );
+        mainBox->Pack( pageButtonBox, false, false);
         // Add the box to the window.
         sfGuiwindow->Add( mainBox );
 
@@ -1399,6 +1548,16 @@ public:
 };
 std::list<std::shared_ptr<GenPopMenu>> genPopMenus;
 
+void genPopMenuRefreshChecker()
+{
+    for(auto &menu : genPopMenus)
+        if(menu.get()->needsRefresh)
+    {
+        menu.get()->sfGuiwindow->RemoveAll();
+        menu.get()->buildMenu();
+        menu.get()->needsRefresh = false;
+    }
+}
 
 
 
@@ -1917,6 +2076,7 @@ void loop()
 {
     applyCamera();
     updateMousePos();
+    genPopMenuRefreshChecker();
 
     if(inputState.key[Key::Space].time == 1)
         attributesMenu.displayStored();
