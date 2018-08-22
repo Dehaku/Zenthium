@@ -1311,6 +1311,7 @@ public:
     sfg::Box::Ptr scrolled_window_box;
     sfg::ScrolledWindow::Ptr scrolledwindow;
     sfg::Label::Ptr page_label;
+    sfg::ComboBox::Ptr combo_boxSortList;
 
     bool needsRefresh = false;
     int pageStart = 0; // We only show 100 entries at a time.
@@ -1364,43 +1365,104 @@ public:
         auto mainBox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 10.f );
         scrolled_window_box = sfg::Box::Create( sfg::Box::Orientation::VERTICAL );
 
-        auto sortNameButton = sfg::Button::Create( "Sort-Name" );
-        sortNameButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
-        {
-            scrolled_window_box->Pack( sfg::Button::Create( "A Button" ) );
-        } );
+        combo_boxSortList = sfg::ComboBox::Create();
+        combo_boxSortList->AppendItem( "Choose Sort Method" );
+        combo_boxSortList->SelectItem(0);
+        combo_boxSortList->AppendItem( "----------" );
+        combo_boxSortList->AppendItem( "(N/A)Sort: Name - Ascending" );
+        combo_boxSortList->AppendItem( "(N/A)Sort: Name - Descending" );
+        combo_boxSortList->AppendItem( "Sort: Type - Ascending" );
+        combo_boxSortList->AppendItem( "Sort: Type - Descending" );
+        combo_boxSortList->AppendItem( "Sort: Total Zen Infused - Ascending" );
+        combo_boxSortList->AppendItem( "Sort: Total Zen Infused - Descending" );
 
-        auto sortTypeButton = sfg::Button::Create( "Sort-Type" );
-        sortTypeButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
-        {
+        combo_boxSortList->GetSignal( sfg::ComboBox::OnSelect ).Connect( [&] {
 
+            // These apply to all sort methods.
             std::vector<std::shared_ptr<Creature>> &num = genPopVector;
             int i, flag = 1, numLength = num.size();
             std::shared_ptr<Creature> tempShape;
             int d = numLength;
-            while( flag || (d > 1))      // boolean flag (true when not equal to 0)
-            {
-                flag = 0;           // reset flag to 0 to check for future swaps
-                d = (d+1) / 2;
-                for (i = 0; i < (numLength - d); i++)
+            // Actual sorting. Not sure how to reduce redundancy further.
+            if(combo_boxSortList->GetSelectedItem() == 4)
+            { // Type Ascending
+                while( flag || (d > 1))      // boolean flag (true when not equal to 0)
                 {
-                    if (num[i + d]->type < num[i]->type)
+                    flag = 0;           // reset flag to 0 to check for future swaps
+                    d = (d+1) / 2;
+                    for (i = 0; i < (numLength - d); i++)
                     {
-                        tempShape = num[i + d];      // swap positions i+d and i
-                        num[i + d] = num[i];
-                        num[i] = tempShape;
-                        flag = 1;                  // tells swap has occurred
+                        if (num[i + d]->type < num[i]->type) // This is the actual 'sorting' method.
+                        {
+                            tempShape = num[i + d];      // swap positions i+d and i
+                            num[i + d] = num[i];
+                            num[i] = tempShape;
+                            flag = 1;                  // tells swap has occurred
+                        }
                     }
                 }
+                needsRefresh = true;
             }
 
-            needsRefresh = true;
-        } );
+            if(combo_boxSortList->GetSelectedItem() == 5)
+            { // Type Descending
+                while( flag || (d > 1))      // boolean flag (true when not equal to 0)
+                {
+                    flag = 0;           // reset flag to 0 to check for future swaps
+                    d = (d+1) / 2;
+                    for (i = 0; i < (numLength - d); i++)
+                    {
+                        if (num[i + d]->type > num[i]->type) // This is the actual 'sorting' method.
+                        {
+                            tempShape = num[i + d];      // swap positions i+d and i
+                            num[i + d] = num[i];
+                            num[i] = tempShape;
+                            flag = 1;                  // tells swap has occurred
+                        }
+                    }
+                }
+                needsRefresh = true;
+            }
 
-        auto sortZenButton = sfg::Button::Create( "Sort-Zen" );
-        sortZenButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
-        {
-            scrolled_window_box->Pack( sfg::Button::Create( "A Button" ) );
+            if(combo_boxSortList->GetSelectedItem() == 6)
+            { // Zen Infused Ascending
+                while( flag || (d > 1))      // boolean flag (true when not equal to 0)
+                {
+                    flag = 0;           // reset flag to 0 to check for future swaps
+                    d = (d+1) / 2;
+                    for (i = 0; i < (numLength - d); i++)
+                    {
+                        if (num[i + d]->getTotalZenthiumInfused() < num[i]->getTotalZenthiumInfused()) // This is the actual 'sorting' method.
+                        {
+                            tempShape = num[i + d];      // swap positions i+d and i
+                            num[i + d] = num[i];
+                            num[i] = tempShape;
+                            flag = 1;                  // tells swap has occurred
+                        }
+                    }
+                }
+                needsRefresh = true;
+            }
+
+            if(combo_boxSortList->GetSelectedItem() == 7)
+            { // Zen Infused Descending
+                while( flag || (d > 1))      // boolean flag (true when not equal to 0)
+                {
+                    flag = 0;           // reset flag to 0 to check for future swaps
+                    d = (d+1) / 2;
+                    for (i = 0; i < (numLength - d); i++)
+                    {
+                        if (num[i + d]->getTotalZenthiumInfused() > num[i]->getTotalZenthiumInfused()) // This is the actual 'sorting' method.
+                        {
+                            tempShape = num[i + d];      // swap positions i+d and i
+                            num[i + d] = num[i];
+                            num[i] = tempShape;
+                            flag = 1;                  // tells swap has occurred
+                        }
+                    }
+                }
+                needsRefresh = true;
+            }
         } );
 
         int devCounter = 0;
@@ -1458,7 +1520,6 @@ public:
 
             scrolled_window_box->Pack( hbox );
         }
-        std::cout << "T: " << clocker.getElapsedTime().asMicroseconds() << std::endl;
 
         scrolledwindow = sfg::ScrolledWindow::Create();
         scrolledwindow->SetScrollbarPolicy( sfg::ScrolledWindow::HORIZONTAL_ALWAYS | sfg::ScrolledWindow::VERTICAL_AUTOMATIC );
@@ -1468,9 +1529,7 @@ public:
 
 
         auto buttonBox = sfg::Box::Create();
-        buttonBox->Pack(sortNameButton);
-        buttonBox->Pack(sortTypeButton);
-        buttonBox->Pack(sortZenButton);
+        buttonBox->Pack(combo_boxSortList);
 
         auto pageButtonBox = sfg::Box::Create();
 
