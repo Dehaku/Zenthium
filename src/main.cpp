@@ -1348,12 +1348,17 @@ public:
     {
         sfGuiwindow->SetTitle( "General Population" );
 
-        sf::Clock clocker;
-        clocker.restart();
-        for(auto &agent : world.genPop)
-            genPopVector.push_back(agent);
 
-        std::cout << "T: " << clocker.getElapsedTime().asMicroseconds() << std::endl;
+        sf::Clock clocker;
+        if(genPopVector.empty())
+        {
+            clocker.restart();
+            for(auto &agent : world.genPop)
+                genPopVector.push_back(agent);
+
+            std::cout << "T: " << clocker.getElapsedTime().asMicroseconds() << std::endl;
+        }
+
 
 
         auto mainBox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 10.f );
@@ -1390,10 +1395,6 @@ public:
             }
 
             needsRefresh = true;
-
-
-
-            // scrolled_window_box->Pack( sfg::Button::Create( "A Button" ) );
         } );
 
         auto sortZenButton = sfg::Button::Create( "Sort-Zen" );
