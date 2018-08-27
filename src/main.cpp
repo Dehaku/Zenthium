@@ -1504,6 +1504,8 @@ public:
             auto fixedNameLabel = sfg::Fixed::Create();
             fixedNameLabel->Put(agentNameLabel,sf::Vector2f(5,0));
 
+
+
             auto agentTypeLabel = sfg::Label::Create(agentType);
             auto fixedTypeLabel = sfg::Fixed::Create();
             fixedTypeLabel->Put(agentTypeLabel,sf::Vector2f(70,0));
@@ -1513,6 +1515,12 @@ public:
             fixedZenLabel->Put(agentZenLabel,sf::Vector2f(50,0));
 
             auto hbox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL);
+
+            hbox->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+            {
+                std::cout << "Hi! I'm " << agent->name << ", Nice to meet you! \n";
+
+            } );
 
             hbox->Pack( fixedNameLabel );
             hbox->Pack( fixedTypeLabel );
@@ -1525,7 +1533,7 @@ public:
         scrolledwindow->SetScrollbarPolicy( sfg::ScrolledWindow::HORIZONTAL_ALWAYS | sfg::ScrolledWindow::VERTICAL_AUTOMATIC );
 
         scrolledwindow->AddWithViewport( scrolled_window_box );
-        scrolledwindow->SetRequisition( sf::Vector2f( 500.f, 100.f ) );
+        scrolledwindow->SetRequisition( sf::Vector2f( 500.f, 500.f ) );
 
 
         auto buttonBox = sfg::Box::Create();
@@ -2177,7 +2185,7 @@ sf::RenderWindow window(sf::VideoMode(800, 600), "Zenthium");
 
 int main()
 {
-
+    window.setFramerateLimit(60);
     world.genWorld();
     setup();
 
