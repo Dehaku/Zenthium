@@ -1345,6 +1345,79 @@ public:
 
     }
 
+    void populatePopulationBox()
+    {
+        sf::Clock clocker;
+        int devCounter = 0;
+        clocker.restart();
+        for(auto &agent : genPopVector)
+        {
+            devCounter++;
+            if(devCounter < pageStart)
+                continue;
+            if(devCounter > pageStart+99)
+                break;
+
+
+            std::string agentName;
+            std::string agentType;
+            std::string agentZen;
+            agentName.append(agent->name);
+
+            agentType.append("Type: ");
+            {
+                if(agent->type == 1)
+                    agentType.append("Normie");
+                if(agent->type == 2)
+                    agentType.append("Mutant");
+                if(agent->type == 3)
+                    agentType.append("Mystic");
+                if(agent->type == 4)
+                    agentType.append("Super");
+                if(agent->type == 5)
+                    agentType.append("Alien");
+                if(agent->type == 6)
+                    agentType.append("Legendary"); // (Secret)
+            }
+            agentZen.append("Zen: ");
+            agentZen.append(std::to_string(agent->getTotalZenthiumInfused().toInt()));
+
+
+            auto agentNameLabel = sfg::Label::Create(agentName);
+            auto fixedNameLabel = sfg::Fixed::Create();
+            fixedNameLabel->Put(agentNameLabel,sf::Vector2f(5,0));
+
+
+
+            auto agentTypeLabel = sfg::Label::Create(agentType);
+            auto fixedTypeLabel = sfg::Fixed::Create();
+            fixedTypeLabel->Put(agentTypeLabel,sf::Vector2f(70,0));
+
+            auto agentZenLabel = sfg::Label::Create(agentZen);
+            auto fixedZenLabel = sfg::Fixed::Create();
+            fixedZenLabel->Put(agentZenLabel,sf::Vector2f(50,0));
+
+            auto hbox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL);
+
+            hbox->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+            {
+                std::cout << "Hi! I'm " << agent->name << ", Nice to meet you! \n";
+
+            } );
+
+            hbox->Pack( fixedNameLabel );
+            hbox->Pack( fixedTypeLabel );
+            hbox->Pack( fixedZenLabel );
+
+            scrolled_window_box->Pack( hbox );
+        }
+    }
+
+    void wipePopulationBox()
+    {
+        scrolled_window_box->RemoveAll();
+    }
+
     void buildMenu()
     {
         sfGuiwindow->SetTitle( "General Population" );
@@ -1465,76 +1538,15 @@ public:
             }
         } );
 
-        int devCounter = 0;
+
         clocker.restart();
-        for(auto &agent : genPopVector)
-        {
-            devCounter++;
-            if(devCounter < pageStart)
-                continue;
-            if(devCounter > pageStart+99)
-                break;
-
-
-            std::string agentName;
-            std::string agentType;
-            std::string agentZen;
-            agentName.append(agent->name);
-
-            agentType.append("Type: ");
-            {
-                if(agent->type == 1)
-                    agentType.append("Normie");
-                if(agent->type == 2)
-                    agentType.append("Mutant");
-                if(agent->type == 3)
-                    agentType.append("Mystic");
-                if(agent->type == 4)
-                    agentType.append("Super");
-                if(agent->type == 5)
-                    agentType.append("Alien");
-                if(agent->type == 6)
-                    agentType.append("Legendary"); // (Secret)
-            }
-            agentZen.append("Zen: ");
-            agentZen.append(std::to_string(agent->getTotalZenthiumInfused().toInt()));
-
-
-            auto agentNameLabel = sfg::Label::Create(agentName);
-            auto fixedNameLabel = sfg::Fixed::Create();
-            fixedNameLabel->Put(agentNameLabel,sf::Vector2f(5,0));
-
-
-
-            auto agentTypeLabel = sfg::Label::Create(agentType);
-            auto fixedTypeLabel = sfg::Fixed::Create();
-            fixedTypeLabel->Put(agentTypeLabel,sf::Vector2f(70,0));
-
-            auto agentZenLabel = sfg::Label::Create(agentZen);
-            auto fixedZenLabel = sfg::Fixed::Create();
-            fixedZenLabel->Put(agentZenLabel,sf::Vector2f(50,0));
-
-            auto hbox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL);
-
-            hbox->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
-            {
-                std::cout << "Hi! I'm " << agent->name << ", Nice to meet you! \n";
-
-            } );
-
-            hbox->Pack( fixedNameLabel );
-            hbox->Pack( fixedTypeLabel );
-            hbox->Pack( fixedZenLabel );
-
-            scrolled_window_box->Pack( hbox );
-        }
+        populatePopulationBox();
 
         scrolledwindow = sfg::ScrolledWindow::Create();
-        scrolledwindow->SetScrollbarPolicy( sfg::ScrolledWindow::HORIZONTAL_ALWAYS | sfg::ScrolledWindow::VERTICAL_AUTOMATIC );
+        scrolledwindow->SetScrollbarPolicy( sfg::ScrolledWindow::HORIZONTAL_ALWAYS | sfg::ScrolledWindow::VERTICAL_ALWAYS );
 
         scrolledwindow->AddWithViewport( scrolled_window_box );
-        scrolledwindow->SetRequisition( sf::Vector2f( 500.f, 500.f ) );
-
+        scrolledwindow->SetRequisition( sf::Vector2f( 500.f, 400.f ) );
 
         auto buttonBox = sfg::Box::Create();
         buttonBox->Pack(combo_boxSortList);
@@ -1618,13 +1630,26 @@ std::list<std::shared_ptr<GenPopMenu>> genPopMenus;
 
 void genPopMenuRefreshChecker()
 {
+
     for(auto &menu : genPopMenus)
         if(menu.get()->needsRefresh)
     {
-        menu.get()->sfGuiwindow->RemoveAll();
-        menu.get()->buildMenu();
+        // TODO: Add options menu to make the Refresh() optional, it slows down menu pages, but makes it so you don't have to click to refresh scroll bar.
+         // Option 1: Wipe all, MS 17000-19000
+        // menu.get()->sfGuiwindow->RemoveAll();
+        // menu.get()->buildMenu();
+
+
+        // Option 2: Wipe only pop box, keeps sort option displayed. MS 85000-190000
+        menu.get()->wipePopulationBox();
+        menu.get()->populatePopulationBox();
+
+        // Option 3: All features, slowest by far. MS 323000-401000
+        menu.get()->scrolledwindow->Refresh( );
+
         menu.get()->needsRefresh = false;
     }
+
 }
 
 
