@@ -587,6 +587,11 @@ std::string generateName(int minLength, int maxLength)
 
     for (int i = 0; i != length; i++)
     {
+        if (i != 0 && i != length-1 && randz(0,100) == 0)
+        { // Apostrophe flavor
+            inserter = "'";
+            name.append(inserter);
+        }
         if (vowel)
         {
             int vowelGen = randz(0, 5);
@@ -619,6 +624,7 @@ std::string generateName(int minLength, int maxLength)
                 doubleLetter = true;
             }
         }
+
         else
         {
             int consenantGen = randz(0, 24);
@@ -683,7 +689,7 @@ std::string generateName(int minLength, int maxLength)
                 doubleLetter = false;
                 vowel = true;
             }
-            else if (randz(0, 2) > 0)
+            else if (randz(0, 30) > 0)
                 vowel = true;
             else
                 doubleLetter = true;
@@ -692,7 +698,8 @@ std::string generateName(int minLength, int maxLength)
 
 
     // Fix the casing.
-    std::transform(name.begin()+1, name.end(), name.begin()+1, ::tolower);
+    if(minLength > 1)
+        std::transform(name.begin()+1, name.end(), name.begin()+1, ::tolower);
 
     return name;
 }
