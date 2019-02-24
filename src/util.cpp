@@ -572,6 +572,7 @@ bool toggle(bool &boolean)
     return boolean;
 }
 
+
 std::string generateName(int minLength, int maxLength)
 {
     // TODO: Add a rememberance for the last added letter,
@@ -688,6 +689,11 @@ std::string generateName(int minLength, int maxLength)
                 doubleLetter = true;
         }
     }
+
+
+    // Fix the casing.
+    std::transform(name.begin()+1, name.end(), name.begin()+1, ::tolower);
+
     return name;
 }
 

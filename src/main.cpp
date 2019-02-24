@@ -252,7 +252,7 @@ public:
     std::list<Territory> territories;
     std::list<std::shared_ptr<Creature>> genPop;
     std::list<std::shared_ptr<Creature>> deadPop;
-    int initialPopulation = 10000;
+    int initialPopulation = 9000;
 
     void genWorld()
     {
@@ -2210,6 +2210,7 @@ sf::RenderWindow window(sf::VideoMode(800, 600), "Zenthium");
 
 int main()
 {
+    generateName();
     window.setFramerateLimit(60);
     world.genWorld();
     setup();
