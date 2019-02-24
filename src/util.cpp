@@ -627,59 +627,59 @@ std::string generateName(int minLength, int maxLength)
 
         else
         {
-            int consenantGen = randz(0, 24);
+            int consonantGen = randz(0, 24);
 
-            if (consenantGen == 0)
+            if (consonantGen == 0)
                 inserter = "B";
-            if (consenantGen == 1)
+            if (consonantGen == 1)
                 inserter = "C";
-            if (consenantGen == 2)
+            if (consonantGen == 2)
                 inserter = "D";
-            if (consenantGen == 3)
+            if (consonantGen == 3)
                 inserter = "F";
-            if (consenantGen == 4)
+            if (consonantGen == 4)
                 inserter = "G";
-            if (consenantGen == 5)
+            if (consonantGen == 5)
                 inserter = "H";
-            if (consenantGen == 6)
+            if (consonantGen == 6)
                 inserter = "J";
-            if (consenantGen == 7)
+            if (consonantGen == 7)
                 inserter = "K";
-            if (consenantGen == 8)
+            if (consonantGen == 8)
                 inserter = "L";
-            if (consenantGen == 9)
+            if (consonantGen == 9)
                 inserter = "M";
-            if (consenantGen == 10)
+            if (consonantGen == 10)
                 inserter = "N";
-            if (consenantGen == 11)
+            if (consonantGen == 11)
                 inserter = "P";
-            if (consenantGen == 12)
+            if (consonantGen == 12)
                 inserter = "QU";
-            //if(ConsenantGen == 12) Inserter = "Q";
-            if (consenantGen == 13)
+            //if(consonantGen == 12) Inserter = "Q";
+            if (consonantGen == 13)
                 inserter = "R";
-            if (consenantGen == 14)
+            if (consonantGen == 14)
                 inserter = "S";
-            if (consenantGen == 15)
+            if (consonantGen == 15)
                 inserter = "T";
-            if (consenantGen == 16)
+            if (consonantGen == 16)
                 inserter = "V";
-            if (consenantGen == 17)
+            if (consonantGen == 17)
                 inserter = "W";
-            if (consenantGen == 18)
+            if (consonantGen == 18)
                 inserter = "X";
-            if (consenantGen == 19)
+            if (consonantGen == 19)
                 inserter = "Y";
-            if (consenantGen == 20)
+            if (consonantGen == 20)
                 inserter = "Z";
 
-            if (consenantGen == 21)
+            if (consonantGen == 21)
                 inserter = "CH";
-            if (consenantGen == 22)
+            if (consonantGen == 22)
                 inserter = "SH";
-            if (consenantGen == 23)
+            if (consonantGen == 23)
                 inserter = "TH";
-            if (consenantGen == 24)
+            if (consonantGen == 24)
                 inserter = "LL";
 
             name.append(inserter);
