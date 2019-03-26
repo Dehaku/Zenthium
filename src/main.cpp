@@ -83,8 +83,12 @@ public:
     unsigned int id;
     std::string name;
     unsigned int age;
+    sf::Color colorMain;
+    sf::Color colorSecondary;
+
     short type; // 1 = Normie, 2 = Mutant, 3 = Mystic, 4 = Super, 5 = Alien, 6 = Legendary(Secret)
-    sf::Vector2i worldPos; // Based on the grid.
+    sf::Vector2i worldPosTile; // Based on the grid.
+    sf::Vector2f worldPosPixel;
 
     // Stats
     BigInteger healthMax;
@@ -142,6 +146,10 @@ public:
         id = globals.globalID++;
         name = generateName();
         type = globals.RWLRace.getRandomSlot()+1;
+
+        colorMain = sf::Color(random(0,255),random(0,255),random(0,255));
+        colorSecondary = sf::Color(random(0,255),random(0,255),random(0,255));
+
         if(type != 1)
         {
             for(int i = 0; i != 3; i++)
@@ -997,6 +1005,48 @@ public:
             genPop.push_back(agent);
         }
     }
+
+    void placeGeneralPopulation()
+    {
+        std::cout << "Attempting to place " << genPop.size() << " agents. \n";
+        for(auto &agent : genPop)
+        {
+            if(!agent.get())
+            {
+                std::cout << "Failed to get\n";
+                continue;
+            }
+
+            bool validPlacement = false;
+            while(validPlacement == false)
+            {
+                agent->worldPosPixel = sf::Vector2f(random(0,32*99),random(0,32*99));
+                // std::cout << (int)agent->worldPosPixel.x/32 << ":" << (int)agent->worldPosPixel.y/32 << std::endl;
+                if(tiles[(int)agent->worldPosPixel.x/32][(int)agent->worldPosPixel.y/32].buildable == true)
+                    validPlacement = true;
+            }
+
+
+        }
+        std::cout << "General Population Placed. \n";
+    }
+
+    void drawPopulation()
+    {
+        for(auto &agent : genPop)
+        {
+            if(!agent.get())
+            {
+                std::cout << "Failed to get\n";
+                continue;
+            }
+            sf::Vector2f agentPos = agent->worldPosPixel;
+            shapes.createSquare(agentPos.x-2,agentPos.y-2,agentPos.x+2,agentPos.y+2,agent->colorMain);
+            shapes.shapes.back().duration = 60;
+            //Shape.duration
+        }
+    }
+
 };
 World world;
 
@@ -2165,6 +2215,36 @@ void setup()
 
 }
 
+void renderPopulation()
+{
+    sf::View oldView = window.getView();
+    window.setView(gvars::view1);
+
+    for(auto &agent : world.genPop)
+    {
+        if(!agent.get())
+        {
+            std::cout << "Failed to get\n";
+            continue;
+        }
+        sf::Vector2f agentPos = agent->worldPosPixel;
+
+        if(!onScreen(agent->worldPosPixel))
+            continue;
+
+        sf::RectangleShape rectangle;
+        rectangle.setSize(sf::Vector2f(2,2));
+        rectangle.setFillColor(agent->colorMain);
+        rectangle.setOutlineColor(agent->colorSecondary);
+        rectangle.setOutlineThickness(1);
+        rectangle.setPosition(agentPos.x, agentPos.y);
+
+        window.draw(rectangle);
+
+    }
+    window.setView(oldView);
+}
+
 void loop()
 {
     applyCamera();
@@ -2203,6 +2283,17 @@ void loop()
         genPopMenus.clear();
     }
 
+
+    if(inputState.key[Key::N].time == 1)
+    {
+        world.placeGeneralPopulation();
+    }
+
+    if(inputState.key[Key::M])
+    {
+        //world.drawPopulation();
+        renderPopulation();
+    }
 }
 
 // Create the main window
