@@ -247,6 +247,55 @@ public:
     }
 };
 
+class Faction
+{
+public:
+    std::string name;
+    int id;
+};
+
+class Resource
+{
+public:
+    enum{Food,Water,Wood,Metal};
+    int type;
+    BigInteger amount;
+};
+
+class Building
+{
+public:
+    std::string name;
+    int id;
+    sf::Vector2i worldPos;
+    bool isHousing;
+    bool isShop;
+    bool isProduction;
+    std::shared_ptr<Faction> owner; // Null if public.
+
+    std::vector<Resource> produces;
+    std::vector<Resource> inventory;
+
+    void makeTownCenter()
+    {
+        name = "Town Center";
+
+        Resource itemProduction;
+        itemProduction.type = Resource::Food;
+        itemProduction.amount = 10;
+        produces.push_back(itemProduction);
+        itemProduction.type = Resource::Water;
+        itemProduction.amount = 10;
+        produces.push_back(itemProduction);
+        itemProduction.type = Resource::Wood;
+        itemProduction.amount = 5;
+        produces.push_back(itemProduction);
+        itemProduction.type = Resource::Metal;
+        itemProduction.amount = 1;
+        produces.push_back(itemProduction);
+    }
+};
+
 class World
 {
 public:
@@ -260,7 +309,7 @@ public:
     std::list<Territory> territories;
     std::list<std::shared_ptr<Creature>> genPop;
     std::list<std::shared_ptr<Creature>> deadPop;
-    int initialPopulation = 9000;
+    int initialPopulation = 1000;
 
     void genWorld()
     {
@@ -2215,6 +2264,91 @@ void setup()
 
 }
 
+void gravitatePopulation()
+{
+    // We iterate through all population, and move them towards all others within a certain distance.
+
+    static int progressiveIteration = 0;
+    static int progressiveIterationLimit = 100;
+
+    int currentIteration = 0;
+    //std::cout << currentIteration << ":" << progressiveIteration <<  ":" << progressiveIterationLimit << std::endl;
+    bool endIt = false;
+    for(auto &agent : world.genPop)
+    {
+
+
+        if(currentIteration >= progressiveIterationLimit-1)
+        {
+            progressiveIteration += 100;
+            progressiveIterationLimit += 100;
+            if(progressiveIterationLimit > world.genPop.size())
+            {
+                progressiveIteration = 0;
+                progressiveIterationLimit = 100;
+            }
+            // std::cout << currentIteration << ":" << progressiveIteration <<  ":" << progressiveIterationLimit << std::endl;
+            endIt = true;
+        }
+        currentIteration++;
+
+        if(currentIteration < progressiveIteration)
+        continue;
+
+
+
+        if(!agent.get())
+        {
+            std::cout << "Failed to get\n";
+            continue;
+        }
+        sf::Vector2f &agentPos = agent->worldPosPixel;
+
+        // How close someone has to be to effect drag.
+        int influenceRange = 100;
+
+        // Pool up all the positions into this, divide later
+        sf::Vector2f averageMovePos;
+        int movePosInfluencers = 0;
+
+        for(auto &otherAgents : world.genPop)
+        {
+            // Don't want our own to affect it.
+            if(otherAgents->id == agent->id)
+                continue;
+
+            // Too far, ignore.
+            if(math::distance(otherAgents->worldPosPixel,agentPos) > influenceRange)
+                continue;
+
+
+            movePosInfluencers++;
+            averageMovePos += otherAgents->worldPosPixel;
+        }
+
+
+
+        // Mix distances for target.
+        averageMovePos.x =  averageMovePos.x / movePosInfluencers;
+        averageMovePos.y =  averageMovePos.y / movePosInfluencers;
+        // std::cout << "Final Pos to Move To: " << averageMovePos.x << ":" << averageMovePos.y << std::endl;
+
+        // Move towards it!
+        if(averageMovePos.x > agentPos.x)
+            agentPos.x++;
+        else if(averageMovePos.x < agentPos.x)
+            agentPos.x--;
+
+        if(averageMovePos.y > agentPos.y)
+            agentPos.y++;
+        else if(averageMovePos.y < agentPos.y)
+            agentPos.y--;
+
+        if(endIt)
+            break;
+    }
+}
+
 void renderPopulation()
 {
     sf::View oldView = window.getView();
@@ -2293,6 +2427,11 @@ void loop()
     {
         //world.drawPopulation();
         renderPopulation();
+    }
+
+    if(inputState.key[Key::Comma])
+    {
+        gravitatePopulation();
     }
 }
 
