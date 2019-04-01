@@ -1082,10 +1082,19 @@ public:
                 continue;
             }
 
-            int randomBuilding = random(0, buildings.size()-1);
-            agent->worldPosPixel = (sf::Vector2f)validPos[randomBuilding];
-            agent->worldPosPixel.x = (agent->worldPosPixel.x*32)+random(-30,30)+16;
-            agent->worldPosPixel.y = (agent->worldPosPixel.y*32)+random(-30,30)+16;
+            bool validPlacement = false;
+            while(validPlacement == false)
+            {
+                int randomBuilding = random(0, buildings.size()-1);
+                agent->worldPosPixel = (sf::Vector2f)validPos[randomBuilding];
+                agent->worldPosPixel.x = (agent->worldPosPixel.x*32)+random(-30,30)+16;
+                agent->worldPosPixel.y = (agent->worldPosPixel.y*32)+random(-30,30)+16;
+
+                if(tiles[(int)agent->worldPosPixel.x/32][(int)agent->worldPosPixel.y/32].buildable == true)
+                    validPlacement = true;
+            }
+
+
 
 
             /* Old random placement
@@ -2432,17 +2441,28 @@ void renderBuildings()
 {
     sf::View oldView = window.getView();
     window.setView(gvars::view1);
+    sf::Texture *initialBuilding = &texturemanager.getTexture("mapBuilding_Towncenter.png");
+    sf::Sprite townCenterSprite;
+    townCenterSprite.setTexture(*initialBuilding);
+    townCenterSprite.setScale(0.5f,0.5f);
+
+
+    // Establishing before hand since creating and destroying one per loop is 'probably' slower than overwriting one each time.
+    sf::Vector2f posQuickCheck;
 
     for(auto &building : world.buildings)
     {
 
-        sf::Vector2f buildingPos;
-        buildingPos.x = building.worldPos.x*32;
-        buildingPos.y = building.worldPos.y*32;
 
-        if(!onScreen(buildingPos))
+        sf::Vector2f buildingPos;
+        buildingPos.x = (building.worldPos.x)*32;
+        buildingPos.y = (building.worldPos.y)*32;
+        posQuickCheck.x = buildingPos.x+16;
+        posQuickCheck.y = buildingPos.y+16;
+        if(!onScreen(posQuickCheck))
             continue;
 
+        /*
         sf::RectangleShape rectangle;
         rectangle.setSize(sf::Vector2f(32,32));
         rectangle.setFillColor(sf::Color::Red);
@@ -2450,7 +2470,12 @@ void renderBuildings()
         rectangle.setOutlineThickness(1);
         rectangle.setPosition(buildingPos.x, buildingPos.y);
 
-        window.draw(rectangle);
+        */
+
+        townCenterSprite.setPosition(buildingPos);
+
+        // window.draw(rectangle);
+        window.draw(townCenterSprite);
     }
     window.setView(oldView);
 }
@@ -2513,7 +2538,7 @@ void loop()
 }
 
 // Create the main window
-sf::RenderWindow window(sf::VideoMode(800, 600), "Zenthium");
+sf::RenderWindow window(sf::VideoMode(1280, 720), "Zenthium");
 
 int main()
 {
