@@ -169,6 +169,7 @@ public:
     int type;
     sf::Vector2i pos;
     bool buildable;
+    bool builtOn;
     bool water;
     bool mountain;
     int territoryGrowthRate;
@@ -209,6 +210,7 @@ public:
     WorldTile()
     {
         type = random(1,3);
+        builtOn = false;
     }
 };
 
@@ -309,6 +311,7 @@ public:
     std::list<Territory> territories;
     std::list<std::shared_ptr<Creature>> genPop;
     std::list<std::shared_ptr<Creature>> deadPop;
+    std::list<Building> buildings;
     int initialPopulation = 1000;
 
     void genWorld()
@@ -1057,6 +1060,19 @@ public:
 
     void placeGeneralPopulation()
     {
+        std::vector<sf::Vector2i> validPos;
+        if(buildings.empty())
+        {
+            std::cout << "No Buildings! Failed Placement of Population! \n";
+            return;
+        }
+
+        // Collect valid positions for easier randomized placement.
+        for(auto &building : buildings)
+        {
+            validPos.push_back(building.worldPos);
+        }
+
         std::cout << "Attempting to place " << genPop.size() << " agents. \n";
         for(auto &agent : genPop)
         {
@@ -1066,6 +1082,13 @@ public:
                 continue;
             }
 
+            int randomBuilding = random(0, buildings.size()-1);
+            agent->worldPosPixel = (sf::Vector2f)validPos[randomBuilding];
+            agent->worldPosPixel.x = (agent->worldPosPixel.x*32)+random(-30,30)+16;
+            agent->worldPosPixel.y = (agent->worldPosPixel.y*32)+random(-30,30)+16;
+
+
+            /* Old random placement
             bool validPlacement = false;
             while(validPlacement == false)
             {
@@ -1074,6 +1097,7 @@ public:
                 if(tiles[(int)agent->worldPosPixel.x/32][(int)agent->worldPosPixel.y/32].buildable == true)
                     validPlacement = true;
             }
+            */
 
 
         }
@@ -1093,6 +1117,31 @@ public:
             shapes.createSquare(agentPos.x-2,agentPos.y-2,agentPos.x+2,agentPos.y+2,agent->colorMain);
             shapes.shapes.back().duration = 60;
             //Shape.duration
+        }
+    }
+
+    void generateInitialBuildings()
+    {
+        int initialBuildingCount = random(30,60);
+        for(int i = 0; i != initialBuildingCount; i++)
+        {
+            bool validPlacement = false;
+            while(validPlacement == false)
+            {
+                sf::Vector2i buildingPos = sf::Vector2i(random(1,98),random(1,98));
+                // std::cout << (int)agent->worldPosPixel.x/32 << ":" << (int)agent->worldPosPixel.y/32 << std::endl;
+                if(tiles[buildingPos.x][buildingPos.y].buildable && !tiles[buildingPos.x][buildingPos.y].builtOn)
+                {
+                    validPlacement = true;
+                    tiles[buildingPos.x][buildingPos.y].builtOn = true;
+
+                    Building building;
+                    building.makeTownCenter();
+                    building.worldPos = buildingPos;
+                    buildings.push_back(building);
+                }
+
+            }
         }
     }
 
@@ -2379,6 +2428,33 @@ void renderPopulation()
     window.setView(oldView);
 }
 
+void renderBuildings()
+{
+    sf::View oldView = window.getView();
+    window.setView(gvars::view1);
+
+    for(auto &building : world.buildings)
+    {
+
+        sf::Vector2f buildingPos;
+        buildingPos.x = building.worldPos.x*32;
+        buildingPos.y = building.worldPos.y*32;
+
+        if(!onScreen(buildingPos))
+            continue;
+
+        sf::RectangleShape rectangle;
+        rectangle.setSize(sf::Vector2f(32,32));
+        rectangle.setFillColor(sf::Color::Red);
+        rectangle.setOutlineColor(sf::Color::Black);
+        rectangle.setOutlineThickness(1);
+        rectangle.setPosition(buildingPos.x, buildingPos.y);
+
+        window.draw(rectangle);
+    }
+    window.setView(oldView);
+}
+
 void loop()
 {
     applyCamera();
@@ -2420,19 +2496,20 @@ void loop()
 
     if(inputState.key[Key::N].time == 1)
     {
+        world.generateInitialBuildings();
         world.placeGeneralPopulation();
-    }
-
-    if(inputState.key[Key::M])
-    {
-        //world.drawPopulation();
-        renderPopulation();
     }
 
     if(inputState.key[Key::Comma])
     {
         gravitatePopulation();
     }
+
+    renderBuildings();
+
+    renderPopulation();
+
+
 }
 
 // Create the main window
