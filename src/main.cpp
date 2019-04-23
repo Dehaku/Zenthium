@@ -262,13 +262,19 @@ public:
     Faction()
     {
         std::string genName;
-        int ranPrefix = random(0,3);
+        int ranPrefix = random(0,10);
         if(ranPrefix == 0)
             genName.append("Empire of ");
-        if(ranPrefix == 0)
+        if(ranPrefix == 1)
             genName.append("Republic of ");
-        if(ranPrefix == 0)
+        if(ranPrefix == 2)
             genName.append("Democracy of ");
+        if(ranPrefix == 3)
+            genName.append("Corpocracy of ");
+        if(ranPrefix == 4)
+            genName.append("Theocracy of ");
+
+
 
         genName.append(generateName(3,7));
 
@@ -330,6 +336,7 @@ public:
     bool quickGrowTerritories = false;
     std::vector<std::vector<WorldTile>> tiles;
     std::list<Territory> territories;
+    std::list<std::shared_ptr<Faction>> factions;
     std::list<std::shared_ptr<Creature>> genPop;
     std::list<std::shared_ptr<Creature>> deadPop;
     std::list<std::shared_ptr<Building>> buildings;
@@ -1172,6 +1179,24 @@ public:
                 }
 
             }
+        }
+    }
+
+    void createGeneralFactions()
+    {
+        for(auto &building : buildings)
+        {
+            if(!building.get())
+            {
+                std::cout << "Failed to get\n";
+                continue;
+            }
+
+            std::shared_ptr<Faction> faction = std::make_shared<Faction>();
+            faction->buildings.push_back(building);
+
+            factions.push_back(faction);
+
         }
     }
 
@@ -2458,6 +2483,46 @@ void renderPopulation()
     window.setView(oldView);
 }
 
+void renderFactions()
+{
+    sf::View oldView = window.getView();
+    window.setView(gvars::view1);
+
+    for(auto &faction : world.factions)
+    {
+        if(!faction.get())
+        {
+            std::cout << "Failed to get\n";
+            continue;
+        }
+
+        for(auto &building : faction->buildings)
+        { // We only want to do the first one, I can't remember how off the top of my head at this very moment, Fix this please.
+            if(!building.get())
+            {
+                std::cout << "Failed to get\n";
+                continue;
+            }
+
+            sf::Vector2f workPos;
+            workPos.x = (building->worldPos.x*32)-32;
+            workPos.y = (building->worldPos.y*32)-32;
+
+            if(!onScreen(workPos))
+                continue;
+
+            sf::Text text;
+            text.setFont(gvars::defaultFont);
+            text.setPosition(workPos);
+            text.setString(faction->name);
+            window.draw(text);
+
+            break;
+        }
+    }
+    window.setView(oldView);
+}
+
 void renderBuildings()
 {
     sf::View oldView = window.getView();
@@ -2547,6 +2612,7 @@ void loop()
     if(inputState.key[Key::N].time == 1)
     {
         world.generateInitialBuildings();
+        world.createGeneralFactions();
         world.placeGeneralPopulation();
     }
 
@@ -2558,6 +2624,8 @@ void loop()
     renderBuildings();
 
     renderPopulation();
+
+    renderFactions();
 
 
 }
