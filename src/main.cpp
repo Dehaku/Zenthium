@@ -16,6 +16,7 @@
 
 void buildChunkImage();
 class Building;
+class Faction;
 
 class Globals
 {
@@ -88,8 +89,14 @@ public:
     sf::Color colorSecondary;
 
     short type; // 1 = Normie, 2 = Mutant, 3 = Mystic, 4 = Super, 5 = Alien, 6 = Legendary(Secret)
+
+    // Belonging
     sf::Vector2i worldPosTile; // Based on the grid.
     sf::Vector2f worldPosPixel;
+    std::shared_ptr<Faction> trueFaction; // For double agents, should be left empty unless active.
+    std::shared_ptr<Faction> faction;
+
+
 
     // Stats
     BigInteger healthMax;
@@ -1119,7 +1126,11 @@ public:
                 agent->worldPosPixel.y = (agent->worldPosPixel.y*32)+random(-30,30)+16;
 
                 if(tiles[(int)agent->worldPosPixel.x/32][(int)agent->worldPosPixel.y/32].buildable == true)
+                {
                     validPlacement = true;
+
+                }
+
             }
 
 
@@ -1197,6 +1208,34 @@ public:
 
             factions.push_back(faction);
 
+        }
+    }
+
+    void assignPopulationToFactions()
+    {
+        for(auto &faction : factions)
+            for(auto &building : faction->buildings)
+        {
+            if(!building.get())
+            {
+                std::cout << "Failed to get\n";
+                continue;
+            }
+
+            sf::Vector2f buildingPos;
+            buildingPos.x = (building->worldPos.x*32);
+            buildingPos.y = (building->worldPos.y*32);
+
+            for(auto &agent : genPop)
+            {
+                // Creature.worldPosPixel
+                if(math::distance(agent->worldPosPixel,buildingPos) <= 300)
+                {
+                    faction->agents.push_back(agent);
+                    agent->faction = faction;
+                }
+
+            }
         }
     }
 
@@ -2614,6 +2653,7 @@ void loop()
         world.generateInitialBuildings();
         world.createGeneralFactions();
         world.placeGeneralPopulation();
+        world.assignPopulationToFactions();
     }
 
     if(inputState.key[Key::Comma])
@@ -2627,6 +2667,56 @@ void loop()
 
     renderFactions();
 
+    if(inputState.key[Key::Period].time == 1)
+    {
+        for(auto &agent : world.genPop)
+        {
+            if(!agent.get())
+            {
+                continue;
+            }
+            if(!agent->type == 4)
+                continue;
+            if(!agent->faction.get())
+            {
+                std::cout << "Failed to get. \n";
+                continue;
+            }
+
+
+            std::cout << "Super: " << agent->name << " of " << agent->faction->name << std::endl;
+
+        }
+
+
+    }
+
+    if(inputState.key[Key::Slash].time == 1)
+    {
+
+        for(auto &faction : world.factions)
+        {
+            std::cout << "vv Faction of " << faction->name << std::endl;
+            for(auto &agent : faction->agents)
+            {
+                if(!agent.get())
+                {
+                    continue;
+                }
+                if(!agent->type == 4)
+                    continue;
+                if(!agent->faction.get())
+                {
+                    std::cout << "Failed to get. \n";
+                    continue;
+                }
+                std::cout << "Super: " << agent->name << " of " << agent->faction->name << std::endl;
+
+            }
+        }
+
+
+    }
 
 }
 
