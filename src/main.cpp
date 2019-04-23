@@ -15,6 +15,7 @@
 #include "FastNoise.h"
 
 void buildChunkImage();
+class Building;
 
 class Globals
 {
@@ -254,6 +255,26 @@ class Faction
 public:
     std::string name;
     int id;
+
+    std::list<std::shared_ptr<Creature>> agents;
+    std::list<std::shared_ptr<Building>> buildings;
+
+    Faction()
+    {
+        std::string genName;
+        int ranPrefix = random(0,3);
+        if(ranPrefix == 0)
+            genName.append("Empire of ");
+        if(ranPrefix == 0)
+            genName.append("Republic of ");
+        if(ranPrefix == 0)
+            genName.append("Democracy of ");
+
+        genName.append(generateName(3,7));
+
+        name = genName;
+    }
+
 };
 
 class Resource
@@ -311,7 +332,7 @@ public:
     std::list<Territory> territories;
     std::list<std::shared_ptr<Creature>> genPop;
     std::list<std::shared_ptr<Creature>> deadPop;
-    std::list<Building> buildings;
+    std::list<std::shared_ptr<Building>> buildings;
     int initialPopulation = 1000;
 
     void genWorld()
@@ -1070,7 +1091,7 @@ public:
         // Collect valid positions for easier randomized placement.
         for(auto &building : buildings)
         {
-            validPos.push_back(building.worldPos);
+            validPos.push_back(building->worldPos);
         }
 
         std::cout << "Attempting to place " << genPop.size() << " agents. \n";
@@ -1144,9 +1165,9 @@ public:
                     validPlacement = true;
                     tiles[buildingPos.x][buildingPos.y].builtOn = true;
 
-                    Building building;
-                    building.makeTownCenter();
-                    building.worldPos = buildingPos;
+                    std::shared_ptr<Building> building = std::make_shared<Building>();
+                    building->makeTownCenter();
+                    building->worldPos = buildingPos;
                     buildings.push_back(building);
                 }
 
@@ -2452,11 +2473,15 @@ void renderBuildings()
 
     for(auto &building : world.buildings)
     {
-
+        if(!building.get())
+        {
+            std::cout << "Failed to get\n";
+            continue;
+        }
 
         sf::Vector2f buildingPos;
-        buildingPos.x = (building.worldPos.x)*32;
-        buildingPos.y = (building.worldPos.y)*32;
+        buildingPos.x = (building->worldPos.x)*32;
+        buildingPos.y = (building->worldPos.y)*32;
         posQuickCheck.x = buildingPos.x+16;
         posQuickCheck.y = buildingPos.y+16;
         if(!onScreen(posQuickCheck))
