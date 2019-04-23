@@ -1604,6 +1604,7 @@ public:
             std::string agentName;
             std::string agentType;
             std::string agentZen;
+            std::string agentFaction;
             agentName.append(agent->name);
 
             agentType.append("Type: ");
@@ -1623,6 +1624,11 @@ public:
             }
             agentZen.append("Zen: ");
             agentZen.append(std::to_string(agent->getTotalZenthiumInfused().toInt()));
+            agentFaction.append("Faction: ");
+            if(!agent->faction.get())
+                agentFaction.append("None");
+            else
+                agentFaction.append(agent->faction->name);
 
 
             auto agentNameLabel = sfg::Label::Create(agentName);
@@ -1639,6 +1645,10 @@ public:
             auto fixedZenLabel = sfg::Fixed::Create();
             fixedZenLabel->Put(agentZenLabel,sf::Vector2f(50,0));
 
+            auto agentFactionLabel = sfg::Label::Create(agentFaction);
+            auto fixedFactionLabel = sfg::Fixed::Create();
+            fixedFactionLabel->Put(agentFactionLabel,sf::Vector2f(50,0));
+
             auto hbox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL);
 
             hbox->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
@@ -1650,6 +1660,7 @@ public:
             hbox->Pack( fixedNameLabel );
             hbox->Pack( fixedTypeLabel );
             hbox->Pack( fixedZenLabel );
+            hbox->Pack( fixedFactionLabel );
 
             scrolled_window_box->Pack( hbox );
         }
@@ -2714,8 +2725,6 @@ void loop()
 
             }
         }
-
-
     }
 
 }
