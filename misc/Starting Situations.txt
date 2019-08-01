@@ -1,0 +1,22 @@
+Favored by Diety
+-Costs all starting bonus points or whatever system is used for that
+-Diety hangs around watching for amusement
+-Randomly grants bonuses, sometimes rarely negatives to the faction and it's agents
+(Diety may simply be a legendary tier Agent that claims to be a diety)
+
+Omega mana faunt
+-Somewhere in the world exists a geyser of pure energy, the closer you approach, the more Omega mana you're charged with.
+-Omega mana acts as a second mana bar(Or acts as A mana bar) that charges up, allowing casting spells and powers at 10x potency.
+-Factions will often set their capital directly next to it, building their city around it.
+
+Immortals
+-3 to 8 'Immortal' agents are generated at creation, they cannot die under any circumstance.
+-Optional Setting, Immortals can slay and absorb the powers and knowledge of other Immortals
+-They each have a unique personality set and theme, and wander from territory to territory, effecting various buildings and populations.
+-They do not join factions
+-Random relations with other Immortals at creation, Potentially changing once every 10 years by a random negative bell curve
+-Types; 
+Peacekeeper(Reduces/Stops criminal events and instances)
+Wanderer(Simply goes place to place, usually increasing wealth within the region from their travels)
+Instigator(Whispers chaotic thoughts into the minds of the population, raising crime rates and unrest)
+Cataloger(Often asks factions for pieces of their research unique to them(1 of 3 highest techs or monopoly branches), sometimes offers rewards *after* the fact)

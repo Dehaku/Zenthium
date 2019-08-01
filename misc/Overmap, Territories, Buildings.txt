@@ -1,0 +1,28 @@
+The worldmap is split up into various randomly shaped territories.
+The territory borders are static, but they contain buildable tiles within.
+Each tile can support one building.
+
+Territories contain these aspects
+-Static borders
+-1 to 3 static resources
+-Building slots
+-Scaling values such as; Safety-/-Dangerous, Poor-/-Luxurious, Anger-/-Happiness
+
+As events happen within a territory, how they are resolved affects the Safety/Dangerous slider.
+General population will pay attention to this before entering the territory.
+Weak/Low ambition population will desire safety territories to relax in.
+Aggressive/Helpful population will desire dangerous territories to assist in the warzones.
+
+
+-Building Slots
+Various buildings can be made to aid your faction, but the general population won't care for most.
+A slot can be leased to the general population for a small Zenny income.
+They will build various stores and hotels that will increase your poor/luxurious slider, attracting more general 
+population and increasing the pool you can recruit from, as well as your passive Zenny income.
+
+If an event occurs on a building slot, The building will be made Unproductive until resolved.
+If resolved in a particularly destructive or undesired way, like failing to engage, failing the engagement, ect... The building
+will become damaged, and require repairs.
+Leased buildings can be assigned agents for repairs, speeding up the process and raising Happiness in the territory.
+Some agents may enjoy this if they are particularly benevolent.
+

@@ -257,6 +257,24 @@ public:
     }
 };
 
+class FactionOrder
+{
+public:
+    std::list<std::shared_ptr<Creature>> agents;
+    std::list<std::shared_ptr<Building>> buildings;
+
+    std::vector<int> subInfo;
+    // Slot 0, Order type: 0 None, 1 Build, 2 Destroy, 3 Assassinate, 4 Kidnap
+    // Slot 1, Build: 1 Farm, 2 Commercial, 3 Industrial
+    // Slot 1, Assassinate:
+
+    // Build, Slot 1, Building to produce
+    // Assassinate, ID of Target (May make target agent lists instead)
+
+
+
+};
+
 class Faction
 {
 public:
@@ -265,6 +283,8 @@ public:
 
     std::list<std::shared_ptr<Creature>> agents;
     std::list<std::shared_ptr<Building>> buildings;
+
+    std::list<FactionOrder> orders;
 
     Faction()
     {
@@ -1657,6 +1677,17 @@ public:
 
             } );
 
+            fixedFactionLabel->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+            {
+                if(!agent->faction.get())
+                    std::cout << "and I'm with no one, woo? \n";
+                else
+                    std::cout << "and I'm with " << agent->faction->name << ", woo? \n";
+
+            } );
+
+
+
             hbox->Pack( fixedNameLabel );
             hbox->Pack( fixedTypeLabel );
             hbox->Pack( fixedZenLabel );
@@ -2734,6 +2765,8 @@ sf::RenderWindow window(sf::VideoMode(1280, 720), "Zenthium");
 
 int main()
 {
+
+
     generateName();
     window.setFramerateLimit(60);
     world.genWorld();

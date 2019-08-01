@@ -1,0 +1,31 @@
+Resources will be generated on the overworld similar to Starwars Galaxies, each material upon generation of the world
+will also have various aspects that are required to produce various technologies and methods
+
+R.W. = Real World equivelent
+
+
+Qualities
+
+(Look at Dwarf Fortress and Starwars galaxies for inspiration)
+
+(Sharpness)
+(Maluability) (Affects ease of crafting with it)
+(Melting Point) (Affects overheat temperatures in machines)
+(Heat Resistence) (Affects temp shift rate)
+(Hardness) (How hard it hits)
+(Impact Resistence) (Lessens how hard it is hit)
+
+
+
+-Energy Conduit(For any electronic, R.W. Copper, Gold)
+-Energy Charge(Holds an electric charge)
+-Energy Generator(Generates electricity, this breaks down into seperate methods, like solar/turbine/fission, with unique efficiencies)
+-Insulator(For clothing and some electronics, R.W. Rubber)
+-Thermal Conduit(For Cooling, Construction)
+-Sturdy(For Construction, R.W. Wood, Stone, Metal)
+-Extra Sturdy(For Intense Construction like Skyscrapers and Spaceships)
+-Burnable(Can be used as fuel for fires and generators)
+-Clean Fuel(Can be used as fuel without pollution or toxic hazards)
+-Zenthium Conduit
+-Transparent(Glass)
+

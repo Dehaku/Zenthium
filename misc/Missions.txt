@@ -1,0 +1,11 @@
+After every combat encounter or mission completion, the kills, incaps, healing performed, stealth takedowns, collateral damage, and 
+looting will be talleyed.
+-Additional Tracking; Failed Stealth maneuvers(Being detected)
+This information will then be filtered through your faction's ethics of secrecy and manipulation, then applied to your populations.
+Population who dislike violence will be upset with kills...
+Lawful population will be unhappy with looting...
+Pacifist population will be happy with incaps and healing...
+Secretive population will be unhappy with failed stealth, but happy with stealth takedowns.
+
+Additionally, mission completions can be willingly broadcasted to enhance the effects on your population, but will also 
+ affect neighboring factions

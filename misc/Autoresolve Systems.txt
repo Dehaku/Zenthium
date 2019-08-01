@@ -1,0 +1,33 @@
+Since there will be so much territory to support, so many agents and factions going on, a competent and enjoyable autoresolve for 
+combat and events will be neccessary.
+The players won't want to handle every mission by hand, after all.
+
+Systems to investigate:
+MGS 5: https://www.reddit.com/r/Warframe/comments/91ilev/when_you_get_an_alert_for_a_nitain_but_youre_at/e309kez/?context=3
+
+
+
+
+**Combat**
+A list of each participating faction will be present.
+Autoresolve will progress one 'round' at a time.
+Each entry in the list will choose a target at random per attack they would get.
+A line is drawn from their entry to the entries they attack that round(Plural support needed due to speed heroes)
+An attack then rolls to-hits and dodges, then reduction is counted, then outer health 
+is affected(energy shields), then inner health is affected(limb health)
+If a limb hits 0 health or below, there's a random chance of it being disabled, mangled, or destroyed, requiring various medicals to heal.
+
+This repeats until only one faction(or pool of allied factions) remains.
+
+An agent can be set to 'healer' in their orders menu outside of conflict.
+Healers will spend their rounds healing a random ally instead.
+If there are no eligible targets to be healed, they will attack instead.
+
+Choosing the autoresolve will have a menu like such
+>Autoresolve<
+>Quiet/Loud< 
+>Lethal/Non-Lethal<
+Quiet is only available if you're the initatior, and allows free hits until you're detected, however comes with
+ the penalty of a loss of half a round for all agents once detected. (This one will likely change)
+Lethal/Non-Lethal governs the type of attacks your agents will do. Non-Lethal strikes are slightly less accurate, and less damaging. 
+(Unless traits or equipment designed for such is present)

@@ -1,0 +1,7 @@
+When producing new weapons/vehicles/ect, you randomly roll unlocked aspects to apply to it.
+
+Guns
+-Damage, Speed, Ect comes from stats
+-Aspects
+Nano Regeneration
+Energy Explosives

@@ -1,0 +1,38 @@
+Faceless
+Type: Mystic
+Pale (but any color) humanoids with blank faces, no eyes, nose, mouth, or ears.
+They always wear distinct masks that represent their identities, and in nearly all situations keep the mask on.
+They can be heard, but their voices sound of whispers.
+They have a form of blindsight that's projected from their masks.
+
+Smallian(Need better name)
+Type: Mutant
+1ft or smaller human-likes with cat-like speed and reflexes, as well as occasional cat or dog ears.
+Physically weak, but precise and fast.
+Sleep toxin in sneeze glands
+
+
+Vampire
+Type: Mystic
+
+
+Android
+Type: Alien
+
+
+
+
+
+Uniques
+
+Name: Ghost in a Shell (Gissy to friends)
+Desc: Elite Psionic creature, fluffy ball with three eyes.
+Prefers to live within a metal sphere with a small circular window.
+Projects psionic arms and legs for mobility and manipulation.
+Type: Mutant or Super
+Capabilities: Powerful psionic abilities, Charismatic
+Equipment: Armored shell that grants psionic power buffs and reduces psionic costs
+
+
+
+

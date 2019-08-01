@@ -1,0 +1,136 @@
+Power Format
+**Name:
+Races:
+Personal Costs:
+Material Costs:
+Description:
+
+
+**Name: Enhanced Attribute
+Races: Mutants, Aliens
+Personal Costs:
+Material Costs:
+Description: Enhanced Strength, Speed, Endurance, All of your classic super powers.
+An agent with this power will have a much higher attribute than normal, though with equally higher metabolism and stamina costs.
+
+**Name: Super Attribute
+Races: Supers
+Personal Costs:
+Material Costs:
+Description: Super Strength, Speed, Endurance, All of your classic super powers.
+An agent with this power will have insane capabilities with no personal cost.
+**Super Strength, Pick up enemy to use as weapon against others, either thrown or used as melee
+
+**Name: Telepathy
+Races: Mutants, Supers, Aliens
+Personal Costs:
+Material Costs:
+Description: Able to read the mind of (Mutant: One, Super: Many) person at a time, and perfectly dodge all of their attacks, and 
+strike through their dodges.
+Also massively amps information gathering in interrogations and such.
+
+**Name: Psionic Limbs
+Description: (Extra) limbs with power equal to mental stats rather than physical. Grants mobility and manipulation.
+Personal Costs: Stamina
+Enhancements: 
+-Multiplies stat to effect ratio
+-Reduced Stamina Cost
+-Optional: Grants extra melee attacks
+
+
+====Types====
+*Enhanced X, Generally for Mutants/Mystics, Improved capability, sometimes with mild downsides.
+*Super X, Generally for Supers, Massive Capability, Usually has no downside.
+*Corrupted X, Generally for Anyone, though usually victims of mad scientists as Discount Supers. Massive Capability, with strong downsides.
+
+
+
+====Attributes====
+Quick recap of attributes and their effects
+Metabolism: The rate at which a character's body work. Hunger/Healing/Stamina Recharge
+Stamina: Short term breath/energy. This is used for running, fighting, holding breath, ect.
+Fatique: Long term energy, This is used for rest, staying awake for days, modifies alertness.
+
+
+
+
+
+
+
+
+Template:
+Name: Ability Name
+Effect: What it does
+Costs: How much Zenthium it takes to impliment, upgrade, or maintain
+Gene Eng: If it can be given/taken by gene engineering
+
+
+
+Material Copy
+-Allows an agent to take on the properties of an item they touch.
+-Corruptions: Automatic, Overloadable, Dampen, Injury
+Gene Eng: Yes
+
+
+Name: Anti-Gun
+Effect: By persuasion, mental domination, or just plain fun, no one will draw a ranged weapon against an agent with this power.
+Gene Eng: No
+
+
+
+
+
+========Techniques=========
+These are abilities that are learned rather than gained innately.
+
+Name: Amplify
+Effect: Damage Dealt and Damage Taken is increased.
+Damage Dealt is increased by N, Damage Taken is increased by N/2, but lasts for twice as long.
+Programming: Status Effect 'Amplify' Toggle, While on, Damage Increase status effect +1 duration, Damage Taken status effect +2 duration.
+Activation; Advanced Action, somewhat slow.
+Teachable: Yes.
+Writable: Yes.
+Itemable: No.
+Upgradable via tramatic event(Loss, generally)
+
+
+Ultimate(Rename)
+Multiply power by x10,x25,x100.
+Drains Stamina by value as well.
+Alternate: Legendary Ultimate, Triple values, but lose control of unit until K.O.
+Alternate: Superior Ultimate, Half as much multiplier, but only 2x stamina drain across the board, Activation Instant
+Alternate: Absorption Ultimate, Only 10x Multiplier with the 25x Stamina drain, but gain all stamina costs of attacks against self.
+Activation; Advanced Action, somewhat slow.
+Teachable: Yes.
+Writable: No.
+Itemable: No.
+Upgradable via tramatic event(Loss, generally)
+
+Rebirth of Power
+Effect: Gain overheal, physical multiplier, and stamina recharge based on how close current health and stamina 
+ are to 0. The closer, the more powerful. 
+(Use a curve so it's 0 above 33%, 100% at 10%, and 1000% at 1%)
+(Make it either unusable, or ignore damage from units of the same faction to avoid gaming it)
+Causes long term fatique that requires bedrest.
+
+Rebirth of Protection
+Effect: Same as above, except it enhances damage resistence, dodge and will/morale, as well as stamina still.
+
+Soul Burn
+Multiplies a single damaging technique or attack by 10, but deals permanent damage to the user.
+Only healing of 10x higher level can restore damage.
+
+Projectile Hold
+For one round or until interupted, able to hold an incoming physical or energy projectile
+The following round, it can be dissipated, dropped, or launched in a chosen adjecent direction
+Alternate: Same as above, but can choose any direction.
+Alternate: Can be dissipated, dropped, or launched on the same round.
+
+
+
+
+
+
+
+Name: Useful Armor
+Effect: Grants percentage of armor from clothing to whole body, no matter placement.

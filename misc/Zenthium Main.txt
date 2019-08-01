@@ -1,0 +1,454 @@
+Super Heroes, Villians, Mutants, Aliens and Organizations compete for territory around the world.
+
+Factions consist of members from the various pools of people.
+
+*Entities*
+Normies(80% population)
+-Normal people, Simple skills and attributes, nothing noteworthy aside from abundance.
+-These people fill a vast majority of factions ranks, as engineers, scientists, diplomats, and constructors.
+
+Mutants(10% population)
+-People who have extrodinary physical qualities based on their own bodies.
+
+Mystics(8% population)
+-Individuals who practice arcane and otherworldly arts, or are infused with them.
+-E.g. Witches, Vampires.
+
+Supers(1% population)
+-Individuals who have unexplainable and usually epic powers and capabilities.
+
+Aliens(1% population, "friendly" to earth)
+-Various Individuals from another planet or dimension entirely. Most are completely hostile. 
+-Many different sects of aliens, very few get along with eachother.
+
+
+
+
+Turn based combat
+
+*Territorial overworld*
+-Factions compete for territory, intelligence, and resources.
+
+-Territory
+By occupying pre-defined regions, a faction will gain resources over time.
+Regions are pre-defined blobs of land or water.
+Land is available right from the start.
+Water regions while visible, require tech to construct floating or underwater buildings, Ooo that'd be good for an expansion. Water terrian, vehicles, merfolk population, and tech!
+
+
+
+
+-Resources
+Currency; Zenthium, a form of super matter that can amp supers and equipment.
+All resources can be purchased from a global market, however their stock is limited.
+Stock is gained by factions selling resources from their territories for Zenthium.
+By controlling all of one source of a resource, a faction can effectively choke out others by refusing to sell.
+
+
+
+
+
+
+*Entity Management*
+Your people have powers, agendas and ethics of their own, and build relationships on the way.
+As your people work together, they grow to love or hate one another, having effects in the field.
+Friends gain defensive bonuses or allied actions.
+Rivals and Enemies gain damage buffs while on the field.
+
+Relations will change either randomly and manipulated by management, or affected by agendas while on the field.
+Like heroes who do not allow killing will grow to rival people who get kills.
+(Traits based? Kleptomania trait, automatically loots enemies for themselves, pisses off most other people)
+
+-Death
+When an entity dies, all allied units will gain various buffs and debuffs based on the relationship.
+A friend will lose defense/accuracy but gain damage.
+A rival will gain speed and movement, but lose damage.
+If the friend is infused with Zenthium, they may sacrifice their soul and become unrevivable by any means, to infuse their friend with 10x the zenthium content they possessed.
+
+
+*Combat mechanics*
+
+Charge
+-Push enemies
+-Through walls
+-Push enemies through walls
+
+Pickup and Throw
+-Enviromental objects as Projectiles or Shields
+-Enemies, at enemies or walls
+-Allies, Thrown as movement (Ala Disgaea)
+
+Counterattack
+-Chance to immediately gain an action during or after being attacked or other special events
+
+
+*Powers*
+Too easy, not worth focusing on.
+However; Most supers will only have one power/ect. Though there wil lbe small odds to have more, and
+increasingly lower odds to have more ontop of that.
+
+
+
+
+
+
+
+*Roster*
+Your global team will be filled with normals and supers.
+Normals can be brought onto the field, which can still be viable. Supers can be brought down, if played smart,
+or simply providing good support for your own supers.
+
+
+
+*Equipment*
+Weapons, Armor and Gadgets can be bought, taken, or researched and developed.
+For 'supers' who are more powerless but gadget based(Ala Tony Stark), they can produce equipment for others
+but gain significant bonuses when using their own equipment. 2x or even 4x benefits.
+
+
+
+
+
+
+
+*How turns work*
+While turnbased, combat is also 'round' based, however 'turns' are not limited by the rounds.
+A round is a vague unit of time which the world goes by, and a turn is an action an individual may take.
+While someone really fast may have 3 'turns' in a 'round', their status effects only tick once per round.
+
+Example; Hero has enough speed to gain 5 turns per round, has 2 health regeneration, and is poisoned by 5.
+This hero may act five times without his health being modified, after which the round catches up, and he
+takes 3 damage.
+
+Turn order is determined by a units Speed attribute, the more speed, the more turns you get.
+Speed is directly counted against the round.
+Example: Hero; 50 speed, Villian; 75 Speed.
+Round 1(Each round is 100 ticks)
+50 ticks in, Hero's up; Acts
+75 ticks in, Villian's up; Acts
+100 ticks in; Hero's up; Acts(50 speed, so acts every 50 ticks.)
+Round 2(The speed ticks are still counted, villian needs 50 more ticks)
+150 ticks in, Both Hero and Villian are up, Hero Acts(Hero has higher speed), Villian Acts;
+200 ticks in, Hero's up; Acts
+Round 3(Ect. Villian's next turn is at tick 225)
+
+
+
+
+
+*Combat Stats and Effects*
+Health Points; How much damage they can take before dropping, This alters their speed and damage as it lowers, capped at 50%.
+Stamina; How many actions can be taken before wearing down, Regenerates slowly as less intense actions are taken.
+Pain; How much punishment they can take at once before taking severe penalties.
+Will; How stable and compliant to your commands they are.
+
+Speed; Rate of turn growth
+Movement; How far they can move in one turn
+Dodge; Chance to avoid taking damage
+Defense(Type); How much damage is removed from an attack, ****Can crit to stun attacker****
+Absorb-For-Health(Type); How much damage is absorbed and turned into healing for the next round.
+Absorb-For-Damage(Type); How much damage is absorbed and turned into damage for the next round.
+Regeneration; How much health is gained per round.
+
+
+
+
+
+*Vision*
+While it would take too much to have a proper combat zone with multiple floors, we can emulate elevation for
+variety and strategy.
+The field will be flat 2d image, but each tile will have it's own 'elevation', Mostly for outdoor maps.
+Ground level is 0, half a person up would be 5, a full person would be 10, contining up.
+Same for negatives and down.
+Vision would be obscured and treated as a wall at 10 difference of current standing.
+Cover could use this same formula. 5 variance being half cover, 10 and beyond being full.
+
+
+
+
+*Multiplayer* (Not doing, maybe in sequel)
+The world map's time will only progress while all player entities have ticked a 'Allow Time Progress' box.
+All players can uncheck it at any time to stop the progress, for managing things.
+Any active battles automatically lock and untick their 'Allow Time Progress' box.
+When a battle occurs, it will be added to the 'Battle' tab, which will list all currently active battles.
+All players can then select and play(if involved) or watch(if waiting for time to progress).
+
+Battles will have a one hour(in game) prep time which allows other players groups to join in if nearby, allowing
+ multiple player ambushes.
+
+
+
+*Combat Display*
+Attacks, Melee attacks will have the attacking entity 'slide' towards the target, then back, over one second.
+Attacks, Range will spawn a colored beam, fading over one second.
+Attacks will cause all affected tiles to glow white for one second.
+This allows melee to act like a 'sweep', or ranged piercing attacks to show their areas.
+
+
+
+*Science, Research, Development*
+There are 3 main fields of progress.
+Science - Gathering of new information.
+Research - Improving already existing information.
+Development - Using the information.
+
+-Science
+Science is performed to gain new information, and fields of research and development.
+By performing science, you can unlock new items, materials, and experiments(Gene, Mystic, and Beyond).
+
+-Research
+Research is performed to improve already existing items, materials, attributes, and other qualities.
+By performing research, you can make armor soak more damage, weigh less, become cheaper to produce, and more.
+This also applies to weapons, buildings, and all other developed equipment, even training speeds and effectiveness.
+
+-Development
+Development is performed to construct buildings, items, and even conduct training on individuals.
+
+
+
+
+*Training*
+Individuals do not level up, randomly gain stats, or abilities.(Unless choosing a specific setting)
+Instead, Individuals progress by training, which is accomplished by being assigned to a training facility at a base.
+Once sent to a training facility, they begin spending time on the specific attribute or quality, and randomly
+ gaining progress towards gaining a 'point' or ability.
+The factors involved are...
+-Time, How long until the following factors are checked and applied.
+-Gain Chance, The chance of gaining progress towards 'completing' the training.
+-Gain Amount, The amount of progress gained.
+All of the above factors can be improved by Research, or simply the Individuals own stats/powers.
+
+Training also causes fatique, draining their max stamina temporarily.
+The Individual's attributes can make them more resistent to fatique, allowing longer training periods.
+
+
+*Ethics*
+Each individual will have a handful of Ethics that govern how they interact with people and the world.
+Ethics spring up in many ways, either on the battlefield, influencing how their team views them, or on
+the overworld, influencing all members of their team over time.
+
+Factions also have their own set of ethics, though this is more loose and dynamic.
+The three most abundant ethics of a factions roster will determine what ethics the faction follows.
+Members of a faction will then act as if they have those ethics while they are with the faction.
+Faction ethics influence members at a vastly lower amount than personal ethics.
+Thus conflicting ethics of a faction and it's members will make them quite unhappy over time.
+Example; Faction Ethic: Lone Wolf, Member Ethic: Group Effort.
+The faction prefers to be distant from eachother on the battlefield, where as the member likes to be as close as possible.
+The member ethic is vastly stronger than the faction ethic, netting a loss.
+
+*Happiness*
+Happiness is important for individuals. An unhappy individual will leave their faction, taking with them what 
+they've learned and can carry.
+Happiness goes up with luxury resources, positive relationships, and success.
+Happiness goes down with a lack of vital resources, more negative relationships than positives, and failing.
+A high happiness also grants faster training times.
+
+
+=======Content=======
+This section is to be filled with fluff, and more specific ideas of what should be included with the various mechanics.
+
+
+==Static Factions==
+=These are factions that will always be generated with a new game, their tech levels and roster will vary, but 
+=their goals will stay the same.
+
+--The Third Eye
+-Purity through force
+These individuals practice and live by the mystic ways, fighting to clense the world of unchecked arcane and exotic
+threats.
+-Population; Mostly Mystics, though other entities are welcomed to join their groups as long as they value clensing.
+-Agenda; They live and grow like anyone else, however their days are spent tracking and dealing with mystics that
+refuse to live peacefully among the world.
+Specifically, They tend to hunt vampires, witches, werewolves, and liches that are not aligned with themselves or
+allied factions.
+-Relations; They tend to be friendly to factions unless they house Mystics of their own, which causes negative reactions
+on their end.
+They're often called out on this paradox when meeting new factions.
+
+
+--The One
+-The hive knows all
+This... individual is composed of many entities, all infected by it's unknown taint. All members share the same thoughts
+and memories instantly. Making any attempts of hostility against it impossible to hide.
+-Population; Anything organic. The One's members are able to infect unconscious beings within seconds, absorbing their
+minds into the collective.
+-Agenda; As terrifying and threatening as this... It seems relatively peaceful. Thankfully it doesn't care 
+for Science and R&D at all, instead attempting to takeover as much free territory as possible.
+However, factions eventually tend to strike against The One, at which point they are met with the full force, and
+usually become absorbed into it.
+This is how The One progresses in fields.
+-Relations; Friendly to any faction, Allies with no one. Never strikes first, and usually gives a second chance.
+
+
+--The Government
+-What the people say, and do, are never the same.
+These individuals attempt to collect the world to join them, following under one system of law and order.
+In the public eye, they keep order and rule with a strict code of ethics.
+In private... They work with Blind Justice.
+-Population; Any law abiding individual. Lawbreakers are cast out or moved to Blind Justice.
+-Agenda; The world's government focuses to peacefully acquire relations with factions to cause them to follow
+their code of ethics.
+They advance peacefully while keeping eyes on everyone.
+-Relations; Peaceful to those who follow their code of ethics, unfriendly with those who employ criminals.
+
+
+--Blind Justice
+-The law cannot punish what it can't see.
+This secret organization of The Government collects unruley and potent individuals to influence and appropriate 
+other factions. 
+All in the name of Justice... and greed.
+-Population; Anyone, Usually paid very well, or held against their will.
+-Agenda; The secret military of the Government. 
+
+
+--The Dredge
+-You got it? We want it.
+These... visitors from another world are a nasty collective of alien species.
+Scavengers, Loots, Raiders... Barbarians.
+They invade and they take everything they can. For what? Who knows. They certainly have more than enough tech of 
+their own.
+-Population; Aliens only.
+Agenda; They raid 
+Relations; Hostile to everyone.
+
+--The Living("Friendly" graverobbing Undead)
+-"Zenthium has given us immortality, even after death"
+This collective has taken the "gift" of zenthium to the extreme, and used it to gain an undead immortality.
+-Population; High ratio of Mystics
+Agenda; Growing their numbers from graveyards via specialized missions in other faction's territory and recruiting
+members with promises of safety and healing from fatal diseases and injuries.
+They don't have much desire outside of growing their numbers, though due to the concentraiton of mystics, secretism and
+a lust for rituals is common
+
+
+
+
+
+
+
+
+
+====Ethics====
+Lone Wolf: Dislikes people as they're close to them.
+Group Effort: Prefers to be close to allies.
+Kleptomaniac: Steals loot for themselve, preventing you from having access to it. Negative relations with others on team.
+Friendly: Generally higher standing than most.
+Secrecy: Dislikes those who share knowledge outside of allies/friends.
+
+-Racist Ethics
+Love/Hate [Group], A natural positive or negative relationship with a specific group, normies, mystics, ect.
+
+
+
+
+===Powers/Traits===
+==Normies
+*Tinkerer
+-Super potent at creating items, 4x bonus to using equipment. (Stats, Defense, Durations)
+
+*Lucky
+-Chance based things are even more common. (Dodging, Hitting, Buff/Debuff chances)
+
+*Training
+-Massively enhanced training gains and time.
+
+==Mutants
+*Speed
+*Regeneration
+
+*Adrenaline
+-When at critical health(33% or below), strength and speed are enhanced.
+
+***Magnetics
+*Magnetic Field
+-Metal projectiles stop if passing near the user.
+
+
+***Telekinetics
+*TK Flight
+-Allows individual to 'fly' on the overworld, and gain movement bonus in combat
+*TK Push
+-Thrusts target individual in target direction, damaging them on impact
+-Super; Thrusts all within area towards or away from center point
+*TK Lift
+-Stuns target
+*TK Crush
+-Damages target via compression
+*TK Disarm
+-Disables or drops target's weapons
+
+
+
+==Mystics
+*Nullifier
+-Disables non-normie related traits and powers.
+
+==Supers
+*One Punch
+-Once per encounter, The individual can oneshot any target, no matter size or power.
+
+==Aliens
+
+==???
+*Wall Creation
+
+*Elevation Alteration
+
+
+
+
+
+
+
+
+===Orbital Stuffs===
+Mecha Drops (On demand deployment of mechas, 3 rounds instead of the 10 rounds from airport drops, though this has more damage on impact for the mecha which can be S,R,D'd to become negligible)
+Teleport Beacons
+Communication Satellites(Allows 'Internet' upgrades for training buildings, as well as faster times for artillery or other called in effects)
+
+
+
+
+
+===Buildings===
+Artillery
+-Allows individuals to call in attacks that land a few rounds later.
+-Research can be done to improve accuracy, reload times, and arrival times, along with the normal weapon statistics.
+-Additional Research; Range. Initial range is one territory, adjecent. With enough range upgrades, two or more territories can be shot over.
+*-Requirements
+-Costs a shell per shot, thus shells must be produced and kept stocked.
+-Firing requires an individual assigned to the building, more individuals increase aiming speed(thus arrival time) and reload speeds, but not accuracy.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===Potential Expansions===
+-Water! 
+Water terrian, vehicles, merfolk population, and tech!
+Underwater and Floating buildings for water regions.
+Under and On water battle maps
+Technology for submersive armor, floating or submersive vehicles, and new resource growing methods, like seaweed for food, or algae for fuels.
+Merfolk population pool. Inline with Mutants or perhaps even being all added into mutants... Mermaids, Crabpeople, Sharks with freakkin laser beams.
+Traits for the new population; Gills for breath, Fins for added speed in and under water.
+
+
+
+
+

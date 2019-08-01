@@ -1,0 +1,43 @@
+====Random Events====
+-Each territory has a chance of random events occuring to them that must be dealt with.
+
+=Kaiju Event=
+-A truely massive alien or mutant runs rampant in a territory.
+-If not dealt with, the creature will cause massive destruction to established buildings in the region as well as deaths.
+-If dealt with, A large collection of etherium can be collected, as well as other potential goodies.
+
+
+=Infestation=
+-A random region will come under threat of an alien or mystic attack of strange beasts.
+-1 to 3 events will occur on the region, and must be clensed of the hostiles to allow the region to be safely used again.
+-While occupied, a region cannot produce any resources, and all buildings are deactivated.
+-Populations in the area will very slowly die off over time, thus players and AI are encouraged to evacuate outside of missions.
+-Potential Beasts; Werewolves, Four legged glowing alien spiders-likes, Necromancer Possession.
+
+
+=Crime Spree=
+-A random region will become the target of a large organized gang of criminals of mixed population pool.
+-1 to 3 events will occur on the region, and must be dealt with by either force, or capture.
+-While occupied, a region's buildings will consume 10x resources while they are activated.
+
+
+=Discount Supers=
+-A mad scientist sets up shop in a hidden location, every day that passes, he turns a random Normie into a Super.
+-The Super's he creates have to visit him once a week or they lose their powers
+-Additionally, The Discount Supers have massive drawbacks, some physical, most mental. Example: Massive Hunger/Psychotic Breaks
+-When finally confronted, you'll have options of how to handle the situation.
+-Recruit: You bring him into your faction, if willingly, a minor morale debuff to your crew due to the harm he's created. If unwillingly, a massive debuff.
+-Loot: You can absorb the technology he's created for a sizable boost to genetic/tech engineering in relation to powers. (Do not get to keep his discount supers capability, though there will be a tech for that.)
+This is only an option if he's taken willingly, otherwise his lab will self destruct.
+-Justice: You can 'arrest' him publicly and gain favor within your territories. (Likely favors change based on ethics)
+
+
+=Meteor Impact=
+-Randomly, a meteor will impact a territory, destroying a random building and giving the territory a new metallic resource, randomly generated.
+-The qualities will vary wildly, from hardness, to melting temp, to energy production(Ala Uranium)
+-Quantity will be limited
+
+=Sudden Volcano=
+-Randomly, a volcano will erupt within a territory, destroying a random building and giving the territory geothermal qualities, and a new metallic resource, randomly generated.
+-The qualities will vary wildly, from hardness, to melting temp, to energy production(Ala Uranium)
+-Volcano will calm and dissolve within a couple years.

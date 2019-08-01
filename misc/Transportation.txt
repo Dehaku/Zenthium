@@ -1,0 +1,6 @@
+All resources move from building to building as actual worldly entities.
+This includes trade, currency, and even people/prisoners.
+During transit, the transport can be encountered by ill intending parties, wayleighed or even destroyed.
+
+Teams of people travel fast
+Transports of resources and people travel slow

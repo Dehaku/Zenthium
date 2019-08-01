@@ -1,0 +1,52 @@
+*===Enhancement Crystals===*
+--Summery
+Zenthium can be used to grow crystals that can then be slotted into equipment for % buffs.
+ZenCrysts are grown at tier 1, and can be fused together over time to produce a single higher tier ZenCryst.
+Each tier requires 3 of the previous to produce.
+
+--Tiers
+Tier 1; 25% Damage / 10% Speed / 10% Energy Refund
+Tier 2; 50% Damage / 20% Speed / 20% Energy Refund
+Tier 3; 75% Damage / 30% Speed / 30% Energy Refund
+Tiers are infinite, only limited by what can be gathered and fused.
+(Energy Refund isn't useful to all gear, and above 100% causes overcharge enhancement uses)
+
+--Growing
+Zenthium can be left in a cultivation pods, spread throughout a territory. Once per day, Per pod, A single tier 1 ZenCryst is produced.
+Higher tier ZenCrysts can be placed within cultivation pods to fuse them into the next tier.
+When a territory is fought over, these pods are present on the battlemap, and can be looted.
+
+--Science Project Upgrades
+(Science) Defenses; Automated Turret will target unaligned entities that approach the pod.
+(Science) Self Destruct; If an unaligned entity approaches the pod, it will begin a self destruct timer.
+(Science) Lock Down; If an unaligned entity approaches the pod, it will lockdown, preventing looters during the battle. Though if the battle is lost, the winner will still gain the contents.
+(Science) Bleeding Growth; Can use blood to speed up growth/fusion rates.
+(Research) Enhance Growth/Fusion Rates
+(Development) Pod Defense
+
+--Misc
+Weapons, Armor, Mechs, Vehicles, Ect all have two ZenCryst slots.
+
+
+
+
+
+
+*===Elemental Amps===*
+Infusing zenthium with other elements will provide additional effects on equipment.(Preferably powers/spells only, but likely too complex)
+*-Elemental Damage
+-20% of base damage is added as extra fire damage.
+-Upgrades stack on compounding 20%'s.
+
+*-Stunning Force
+-Damage compared to targets max health is treated as a percentage chance for stunning.
+-Upgrades increase stun duration.
+
+
+
+
+
+
+
+
+

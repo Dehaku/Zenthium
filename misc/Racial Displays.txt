@@ -1,0 +1,16 @@
+Entity pools each have their own colored border when represented by default.
+While the player can change these for their own factions, AI controlled factions never do.
+
+The publicly known tiers are
+-Normies
+-Mutants
+-Mystics
+-Supers
+-Aliens
+There's another tier that is considered spoilers.
+-Legendary
+These individuals are nearly undefeatable. Leagues above supers.
+They never kill however, but they wipe the floor non-lethally.
+Their color is unique from the rest, and they're exceptionally rare.
+1 in 10000
+Compared to supers 1 in 100.

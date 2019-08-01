@@ -1,0 +1,53 @@
+
+
+
+
+
+*==Attributes==*
+An agent's base capabilities are made of the following stats.
+
+*Sum Cap
+*+Speed
+*+Strength
+*+Agility
+*+Endurance
+*+Charisma
+*+Intelligence
+(*, Can be raised)
+(+, Can be taught)
+
+While attributes can be trained higher, they are limited.
+An agent has a maximum attribute sum cap that their attributes can be raised to.
+Example
+Sum Cap 30
+Speed 20, 10 strength, all others are 0. No more attribute gains can be acquired.
+Speed 5, Strength 5, Agility 5, Endurance 5, Charisma 5, Intelligence 5, Sum of 30.
+The Sum Cap can be raised, but is far more difficult to raise than the base attributes.
+Talents, Races, and powers can modify the sum cap as well.
+
+*==Other Attributes==*
+These may need to be moved to other catagories
+Stamina
+Stamina Regen
+Mana
+Mana Regen
+
+Health Points; How much damage they can take before dropping, This alters their speed and damage as it lowers, capped at 50%.
+Stamina; How many actions can be taken before wearing down, Regenerates slowly as less intense actions are taken.
+Pain; How much punishment they can take at once before taking severe penalties.
+Will; How stable and compliant to your commands they are.
+
+Movement; How far they can move in one turn
+Dodge; Chance to avoid taking damage
+Defense(Type); How much damage is removed from an attack, ****Can crit to stun attacker****
+Absorb-For-Health(Type); How much damage is absorbed and turned into healing for the next round.
+Absorb-For-Damage(Type); How much damage is absorbed and turned into damage for the next round.
+Regeneration; How much health is gained per round.
+
+
+
+*==Skills==*
+Teaching
+Learning
+
+

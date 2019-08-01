@@ -1,0 +1,24 @@
+Personalities
+Secrecy <-> Openness
+
+
+Territory Thing
+Allow constructing of genetic scanners upon entry, and around the city. The population with secrecy personalities will be 
+unhappy about this, and discouraged to move in, and encouraged to move out.
+
+Genetic Scanners
+Reveals the genome type of people. (Normal, Mutant, Super, ect) 
+They can skip it they desire with secrecy personality, and high enough stealth skill.
+Failing the stealth skill will put a warrent on them for tresspassing.
+
+-Borders
+--Reveals upon entering and exiting your territory. 
+-Territory
+--% Chance of revealing someone's genome per day.
+
+*--Upgrades
+-Stealth Placement
+--Less impact on secrecy population unless they have high alertness skills, can be upgraded for better effect.
+-Checkpoints
+--Increased odds of the territory scanners to reveal per day, does not conflict with stealth placement.
+

@@ -1,0 +1,13 @@
+Damage
+Range
+Range Dropoff
+Accuracy
+Magazine Capacity
+
+Jamming Rate(Chance)
+
+Durability
+Weight
+
+Armor(Damage Resistence)
+

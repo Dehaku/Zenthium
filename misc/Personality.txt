@@ -1,0 +1,9 @@
+Personality is consisted of various sliders. Individuals will favor those who lean closer to their views.
+
+Bright <-> Brooding
+Calm <-> Excitable
+Greedy <-> Generous?
+Cruel <-> Merciful
+Caring <-> Aloof
+Crude <-> Elegant
+Secrecy <-> Openness

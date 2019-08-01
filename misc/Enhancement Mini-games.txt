@@ -1,0 +1,45 @@
+Certain buildings even some actions will prompt the player with a mini-game, for additional performance upgrades.
+While the mini-games are optional, they are powerful and encouraged.
+Each mini-game is designed to be infinite in nature, but grows more difficult with each round, ending when the player fails.
+The difficulty can be lowered by selecting a highly skilled agent to perform the 'upgrade.'
+The minigames can be played once per overmap turn, with no limit.
+Failing does not degrade the quality.
+
+==Resource Collection Buildings
+Each round provides a 20% compounding resource quantity buff. (Ex, Three rounds would grant 72% more resources)
+
+**Minigame
+In the center is a Black box, Somewhere in the field is a single randomly placed invisible point.
+You must attempt to click it within the field.
+The closer to the pixel the higher your score(0-100).
+Every second, a ring will pulse from your cursor, extending outwards until it collides with the desired point, helping the player find it.
+You win by meeting a threshold of score from clicking, 70 base level.
+A timer will apply pressure, automatically failing if time runs out.
+
+*Difficulty Effects
+Low difficulties will not have a timer.
+Higher difficulties will lower the timer even more.
+Higher difficulties will reduce the range at which you start earning points from clicking the pixel.
+??? The delay at which the ring is released. (No longer than 1/3rd the timer for that round, The player must see two rings before it ends)
+??? The rate at which the ring expands.
+
+
+
+==Power Generation Buildings
+Each round provides a 20% compounding power generation buff. (Ex, Three rounds would grant 72% more power)
+This applies to all power plant types, from the lowly river turbine, to the zenthium enhanced uranium nuclear generator.
+
+**Minigame
+Various sliders will be present, each one with a specific point along their slide that is most optimal.
+A percentage power readout(fluff) will display the current enhanced power, informing you of your enhancements.
+A red percentage heat readout will display the current overheat risk, 100% overheat or 0% heat will cause an instant failure. (No damage to the plant, maybe)
+Two sliders on the left will control the power output, two sliders on the right will control temperature.
+The goal is to raise a specific amount of power without overheating or underheating before time runs out, by balancing and fine tuning the sliders.
+The first slider for both sides changes the rate at which the power and heat modifier is applied.
+The second slider for both sides changes the amount of power and heat that is applied.
+The second slider for power also directly raises the heat.
+
+*Difficulty Effects
+Low difficulties will not have a timer.
+Higher difficulties will lower the timer even more.
+Higher difficulties will increase the rate at which the temperature is changed.

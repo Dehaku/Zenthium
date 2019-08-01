@@ -1,0 +1,44 @@
+Training is the primary method of character advancement. Agent's don't gain skills from slaying enemies, they gain them from rigerous 
+and intense training.
+
+Training speed and effectiveness is modified by various sources.
+Agent's inspiration/discipline attribute is the base rate.
+Agent's strength or intelligence modifies speed.
+Training building affects speed and effectiveness, modified by S,R,D.
+Training Method affects all the rest.
+Finally, Extra methods via... 
+equipment(training weights, maybe be ignored for training building)
+zenthium infusion(Either equippable mods, ZenCrysts, or perhaps raw zenthium infusion multiplier)
+Or Drive(grown from combat, upon seeing allies get injured or die) 
+
+
+**Training Methods
+-Excercises
+This is the standard method of growth, visit a training building, spend time, grow attributes and skills.
+-Study
+This is available from Training Buildings that have been upgraded with libraries made by intelligent agents, or with access from the internet science project.
+###This method will likely increase a growth multiplier, rather than the actual skill. Study for a time, then exercise with enhanced results.
+-Mentor
+While an agent is performing Exercises or Study, another agent can be assigned to them to help them train faster.
+This is effective up until the student catches up to the mentor's level.
+The rate at which the mentor is effective is based on the Friend/Rival scale. The more intense the relationship, the faster the growth.
+Each training session procs their motives against one another, furthering the relationship.
+
+
+
+
+Old;
+
+*Training*
+Individuals do not level up, randomly gain stats, or abilities.(Unless choosing a specific setting)
+Instead, Individuals progress by training, which is accomplished by being assigned to a training facility at a base.
+Once sent to a training facility, they begin spending time on the specific attribute or quality, and randomly
+ gaining progress towards gaining a 'point' or ability.
+The factors involved are...
+-Time, How long until the following factors are checked and applied.
+-Gain Chance, The chance of gaining progress towards 'completing' the training.
+-Gain Amount, The amount of progress gained.
+All of the above factors can be improved by Research, or simply the Individuals own stats/powers.
+
+Training also causes fatique, draining their max stamina temporarily.
+The Individual's attributes can make them more resistent to fatique, allowing longer training periods.

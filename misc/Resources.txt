@@ -1,0 +1,21 @@
+-Zenthium
+Global currency, Main ingredient in growing powers and traits, fuel for super tech.
+
+
+-Food
+1 unit consumed per day, Lack of food lowers morale.
+-Water
+1 unit consumed per day, Lack of water adds "Weakened" debuff.
+
+
+
+-Metals
+Ingredients for weaponry
+-Biomaterials
+Ingredients for crafting
+
+-Oil
+Early flame weapons, later power generation, refined for machine efficiency, component to plastic alloys
+
+
+

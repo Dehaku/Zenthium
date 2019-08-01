@@ -1,0 +1,30 @@
+Zenthium can be infused into all races to enhance their natural abilities, learned abilities, and powers.
+Permanent enhancements can be done in small portions for large amounts of zenthium, altering the baseline...
+While Temporary enhancements can be done in large portions for small amounts of zenthium, but tend to have side 
+effects, physically and mentally after it wears off, while also having a 25% chance of becoming addicted.
+
+Permanent Zenthium Infusions, as expected, raise the amount of zenthium within the body, however the zenthium is amplified in quantity once within.
+As a lethal option, agents or prisoners can be infused with zenthium, and then harvested to gain a considerably sum more than invested(+50%)
+This action will massively affect morale based on ethics, as well as faction and public opinions.
+
+
+
+*Normies can be affected in the listed ways by Zenthium
+Small attribute increases(10-20% per dose)
+
+*Mutants can be affected in the listed ways by Zenthium
+Small attribute increases(10-20% per dose)
+Mutations can be increased in potency
+
+*Mystics can be affected in the listed ways by Zenthium
+Small attribute increases(10-20% per dose)
+Abilities/Spells can be increased in potency
+
+*Supers can be affected in the listed ways by Zenthium
+Medium attribute increases(30-50% per dose)
+Mutations can be increased in potency
+Abilities/Spells can be increased in potency
+
+*Aliens can be affected in the listed ways by Zenthium
+Large attribute increases(70-100% per dose)
+Unique Qualityes can be increased in potency

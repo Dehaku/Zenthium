@@ -1,0 +1,60 @@
+Power Generation
+-Solar
+-Wind
+-Combustion
+-Nuclear
+-Raw Zenthium
+
+Raw Zenthium Power Generators can be built pretty early into civilization and can produce massive amounts of power, however 
+they are big, vunerable, and dangerous.
+They are made of two seperate overworld building types, with at least 8 buildings needing to be constructed for operation.
+They generate power in bursts, typically twice a day. Once at high noon, and once at midnight, and they slowly emit their immense power.
+The types are Collectors, and Emitters.
+
+-Collectors are the simplist, You must construct a 2x2 array of Collectors, location isn't as important as emitters.
+The collectors consume a small amount of Zenthium per output charge.
+
+-Emitters, four to be exact, require a lot of planning.
+The further they are constructed from the collectors, the more power and efficency they possess... and they must be
+built with perfect four way symmetry.
+Each emitter must have the same relative distance and offset as the others when the positions are flipped.
+Example:
+XXXXXXXX
+XEXXXXEX
+XXXXXXXX
+XXXOOXXX
+XXXOOXXX
+XXXXXXXX
+XEXXXXEX
+XXXXXXXX
+
+or
+
+XXEXXXXX
+XXXXXXXX
+XXXXXXXE
+XXXOOXXX
+XXXOOXXX
+EXXXXXXX
+XXXXXXXX
+XXXXXEXX
+
+Both are acceptable, as are many other positions and distances. They must simply be the same when flipped in any way.
+
+-Activation and Dangers
+Once the device activates, the emitters spend the next hour beaming Zenthium focused energy towards the emitters, slightly offset to 
+create a circular disk of energy above the collectors.
+If any of the emitters breaks or fails to operate while the disk of energy is being charged, it will cause an explosion in the radius
+  of half the distance from the emitters to the collectors.
+Additionally, due to distance amplifying power generation and effiency, there is a danger in the simple fact that protecting all 
+   four emitters at once can be an issue, and makes for a potent sabotage target, even with the small emitter window.
+
+Finally, if the disk of power is fully activated, the emitters shut off and are not of importance until noon/midnight again.
+The disk of power peacefully generates the desired power while being activated and while persisting the rest of the day.
+If a collector is destroyed while the disk of power is present, it simply dissipates. The danger lies in the unstable nature of the 
+  emitters charging the disk, not the disk once stable.
+
+Assuming nothing happens to the emitters or collectors, the Raw Zenthium Power Generator provides power all day and night, even during activation peroids.
+It consumes a large dose of Zenthium per activation, but only a trivial amount to maintain throughout the day.
+
+

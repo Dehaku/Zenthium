@@ -1,0 +1,34 @@
+Read Main for some Defaults
+
+
+Faction Type: Research and Secrecy
+Ranking/Heirarchy: Multiple ranks, labeled Level 1 through 5. 1 being the highest leader
+Plans/Knowledge:The higher the level, the more influence.
+Management:All subordinates must obey superiors
+Examples: Level I, Level II, Level III, Level IV
+
+
+Faction Type: Military
+Ranking/Heirarchy: Multiple ranks, a mishmash of various real world military ranks
+Plans/Knowledge:Starting midway, The higher the level, the more influence.
+Management:All subordinates must obey superior 'of three ranks higher or above'
+Examples: Private, Captain, Corporal, General
+
+
+Faction Type: Council Democracy
+Ranking/Heirarchy: Two ranks, Citizen and Council. Councils do all the work and elect citizens into Council.
+Plans/Knowledge:Only Council
+Management:Council manage the Citizens
+Examples: Citizen, Council
+
+Faction Type: Hive
+Ranking/Heirarchy: One Rank, One Entity
+Plans/Knowledge:One Mind
+Management:One Body
+Examples:One Collective
+
+Faction Type: Mystic
+Ranking/Heirarchy: Follows many religion/monk heirarchies.
+Plans/Knowledge:Only the top two ranks
+Management:All subordinates must obey superiors
+Examples: Disciple, Scholar, Professor, Philosopher, Priest, Saint

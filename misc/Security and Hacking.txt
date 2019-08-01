@@ -1,0 +1,12 @@
+Age of Electronics
+-Gives birth to hacking
+-Early eras have no defenses, but gives massive efficency boost
+-Mid eras begin having basic defenses
+-Late eras have strong defenses, but begin reducing efficiency boost
+
+
+Doors
+-Fingerprint/Eye/Biometric Scanners
+
+Hacking
+-Copied Fingerprint/Eye/Biomentric

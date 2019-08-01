@@ -1,0 +1,25 @@
+Vehicles consist of Motorcycles, Cars/Trucks, Tanks, Mechas, Helicopter/Planes.
+Vehicles are constructed in Garage buildings and can be assigned to agents for overworld and battlemap use.
+
+
+
+On the overworld, Vehicles have their own speed, almost always faster than the agent's normal speed, allowing greater travel.
+Squads of agents can benefit from the vehicles speed if there's enough passenger slots. 
+All squad vehicles are talleyed, and travel at the slowest speed. If there's not enough passenger slots for everyone, this speed is on-foot travel speed.
+
+On the battlemap, Vehicles take up at least 1 to 10 radius of tiles, can move any direction freely(For simplicity, turning doesn't matter),
+and if it's weight and strength is high enough, can smash through terrian with ease.
+
+
+
+Vehicle Attributes
+Speed
+Health
+Passengers
+Fuel Capacity
+Fuel Cost
+
+(Equipment), Weapons, Gadgets, ect
+
+(Inventory), Trunk/Storage Space.
+

@@ -1,0 +1,59 @@
+S,R,D.
+-Science provides new fields of thought and concepts, in short, unlocking new things.
+--Unlocking guns, solar power, flight, ect.
+-Research allows improving upon existing technologies and concepts.
+--Making weapons deal more damage, training more effective, zenthium mining effiency, ect.
+-Development governs the construction and manufactoring of buildings, gear, and other products.
+--???, Probably governs solidifying milestones from research to produce prototypes, and gradually makes milestone projects cheaper.
+--Affects final percentages of stats, making them even better. Also affects item cost
+
+Milestone: While research can constantly improve something, it cannot be constructed until the current research is turned into a template for construction, called a milestone.
+So if you had a gun with 20 damage and researched it's damage to 23, you cannot produce the gun until you turn it into a new milestone.
+Short example, Machine Pistol Mk II(10 dam, 10 acc, 10 lbs), producable. Accuracy is researched up to 16, but Mk II is still 10.
+So you produce a new milestone with the stats, so you now have Machine Pistol Mk III(10 dam, 16 acc, 10 lbs).
+You still have Mk II's in your inventory, with only 10 acc. But now you can also produce Mk III, whic hahs 16 acc.
+
+
+
+
+
+*====Projects====*
+
+*==Science
+*-Internet
+-Allows territories to link their computational resources, as well as increasing communication possabilities.
+-Better communication, faster support times, like air support attacks, orbital drops, ect.
+*-Orbit
+-Prequisite for various technologies
+*-Thruster
+-Extremely fast, but heavy, hot, and fuel hungry propulsion
+*-Flight
+-Allows constructing vehicles and gear that can fly
+*-Computers
+-Enhances research speeds, and machine accuracy.
+*-Neural Interface
+-Allows meshing agents with machinery
+*-Neural Harddrive
+-Allows instantly downloading archived information
+-Instantly trains an agent's levels up to what has been stored.
+*-Night-Night
+-Allows refinement of special herbs into knock out poisons
+*-All Nighty-Night Long
+-Allows knock out poison refinement into a progressively stronger version upon movement per round.(Standing still will leave basic poison potency, each round moved doubles the previous potency, for knocking out faster/bigger targets)
+*-Acupuncture
+-A form of long term healing, enhancable with zenthium for supers
+*-3d Printing Gun
+-Allows guns to fire multiple types of ammo on the same magazine, modifies the bullet in the chamber. Slows fire rate.
+Gravity Manip
+Low; Training Center, Mid, Vehicles, High; Space speedups
+*-Self Matter Manipulator
+-Allows devices and stations to automatically upgrade to latest model when within their own faction territory.
+-Example: Advanced rifle is made obsolete by enhanced damage research, when brought within the territory, it automatically 'downloads' and upgrades itself to the new model with enhanced damage.
+
+
+
+*-Recon Sattelite
+Each recon satellite launched into orbit can then be used to grant vision on a battlefield, cooldowns dependent on technology, generally 1 week to start with.
+Can be upgraded to thermal to allow vision in buildings
+Buildings can be upgraded for thermal resistence
+
