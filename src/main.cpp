@@ -264,14 +264,22 @@ public:
     std::list<std::shared_ptr<Building>> buildings;
 
     std::vector<int> subInfo;
-    // Slot 0, Order type: 0 None, 1 Build, 2 Destroy, 3 Assassinate, 4 Kidnap
+
+    bool toDelete;
+    // Slot 0, Order type: 0 None, 1 Build, 2 Destroy, 3 Assassinate, 4 Kidnap, 5 Scout, 6 Seduce
     // Slot 1, Build: 1 Farm, 2 Commercial, 3 Industrial
     // Slot 1, Assassinate:
 
     // Build, Slot 1, Building to produce
     // Assassinate, ID of Target (May make target agent lists instead)
 
-
+    FactionOrder()
+    {
+        subInfo.push_back(0);
+        subInfo.push_back(0);
+        subInfo.push_back(0);
+        toDelete = false;
+    }
 
 };
 
@@ -281,6 +289,48 @@ public:
     std::string name;
     int id;
 
+    int needFood;
+    int needHousing;
+    int needWeapons;
+
+    int getNeedFood()
+    { // This returns the faction's need for food, with food projects in mind.
+        int returnVar = needFood;
+        returnVar += agents.size()*2;
+        // Loop through buildings, reducing this number by food producers.
+        return returnVar;
+    }
+    int getNeedFoodConstructionless()
+    { // This returns the faciton's true need for food, ignoring any buildings currently in construction.
+        int returnVar = needFood;
+        returnVar += agents.size()*2;
+        // Loop through buildings, reducing this number by food producers, ignoring ones under construction.
+        return returnVar;
+    }
+
+    int getNeedHousing();
+    int getNeedHousingConstructionless();
+
+    int getNeedWeapons();
+    int getNeedWeaponsConstructionless();
+
+    void processOrders();
+
+    sf::Vector2i getFactionCenter();
+
+    void thinkDay()
+    {
+        if(getNeedFood() > 0)
+        {
+            FactionOrder FO;
+            FO.subInfo[0] = 1; // Build
+            FO.subInfo[1] = 1; // Farm
+            orders.push_back(FO);
+        }
+
+        processOrders();
+    }
+
     std::list<std::shared_ptr<Creature>> agents;
     std::list<std::shared_ptr<Building>> buildings;
 
@@ -288,6 +338,10 @@ public:
 
     Faction()
     {
+        needFood = 20;
+        needHousing = 10;
+        needWeapons = 10;
+
         std::string genName;
         int ranPrefix = random(0,10);
         if(ranPrefix == 0)
@@ -350,7 +404,38 @@ public:
         itemProduction.amount = 1;
         produces.push_back(itemProduction);
     }
+
+    void makeFarm()
+    {
+        name = "Farm";
+
+        Resource itemProduction;
+        itemProduction.type = Resource::Food;
+        itemProduction.amount = 10;
+        produces.push_back(itemProduction);
+    }
 };
+
+sf::Vector2i Faction::getFactionCenter()
+{
+    sf::Vector2i returnPos(0,0);
+
+    for(auto &building : buildings)
+    {
+        if(!building.get())
+        {
+            std::cout << "Failed to get\n";
+            continue;
+        }
+        returnPos.x += building->worldPos.x;
+        returnPos.y += building->worldPos.y;
+    }
+
+    returnPos.x = returnPos.x/buildings.size();
+    returnPos.y = returnPos.y/buildings.size();
+
+    return returnPos;
+}
 
 class World
 {
@@ -1313,7 +1398,71 @@ bool growTerritories(bool skipGrowGraphics = false) // returns true when nothing
     return false; // There's more to do.
 }
 
+void Faction::processOrders()
+{
+    std::cout << "Wee. \n";
 
+    for(auto &order : orders)
+    {
+
+        if(order.subInfo[0] == 1) // If order is Build
+        {
+            bool validPlacement = false;
+            int iterations = 0;
+            int reachRange = 1;
+            while(validPlacement == false)
+            {
+                iterations++;
+                if((iterations % 15) == 0)
+                    reachRange++;
+                if(iterations == 10)
+                std::cout << "Attempt 10\n";
+                if(iterations == 100)
+                std::cout << "Attempt 100\n";
+                if(iterations == 500)
+                std::cout << "Attempt 500\n";
+
+                if(iterations > 1000)
+                {
+                    std::cout << "Build order attempt 1k+, Bad things are happening. Good luck. \n";
+                    order.toDelete = true; // Good luck.
+                    break;
+                }
+
+                sf::Vector2i factionCenter = getFactionCenter();
+                if(iterations == 2)
+                    std::cout << factionCenter.x << ", " << factionCenter.y << std::endl;
+
+                int xPos = factionCenter.x+random(-reachRange,reachRange);
+                int yPos = factionCenter.y+random(-reachRange,reachRange);
+                if(iterations == 2)
+                    std::cout << xPos << ", " << yPos << std::endl;
+                sf::Vector2i buildingPos = sf::Vector2i(std::max(std::min(xPos,98),1),std::max(std::min(yPos,98),1));
+                if(iterations == 2)
+                    std::cout << buildingPos.x << ", " << buildingPos.y << std::endl;
+
+                if(world.tiles[buildingPos.x][buildingPos.y].buildable && !world.tiles[buildingPos.x][buildingPos.y].builtOn)
+                {
+                    validPlacement = true;
+                    world.tiles[buildingPos.x][buildingPos.y].builtOn = true;
+
+                    std::shared_ptr<Building> building = std::make_shared<Building>();
+                    building->makeFarm();
+                    building->worldPos = buildingPos;
+                    world.buildings.push_back(building);
+
+                    buildings.push_back(building);
+                    order.toDelete = true;
+
+                }
+
+            }
+        }
+
+    }
+    AnyDeletes(orders);
+
+}
 
 class WorldMenu
 {
@@ -2613,6 +2762,11 @@ void renderBuildings()
     townCenterSprite.setTexture(*initialBuilding);
     townCenterSprite.setScale(0.5f,0.5f);
 
+    sf::Texture *buildingFarmTexture = &texturemanager.getTexture("mapBuilding_Farms.png");
+    sf::Sprite buildingFarmSprite;
+    buildingFarmSprite.setTexture(*buildingFarmTexture);
+    buildingFarmSprite.setScale(0.5f,0.5f);
+
 
     // Establishing before hand since creating and destroying one per loop is 'probably' slower than overwriting one each time.
     sf::Vector2f posQuickCheck;
@@ -2643,10 +2797,18 @@ void renderBuildings()
 
         */
 
-        townCenterSprite.setPosition(buildingPos);
+        if(building->name == "Town Center")
+        {
+            townCenterSprite.setPosition(buildingPos);
+            window.draw(townCenterSprite);
+        }
 
-        // window.draw(rectangle);
-        window.draw(townCenterSprite);
+        if(building->name == "Farm")
+        {
+            buildingFarmSprite.setPosition(buildingPos);
+            window.draw(buildingFarmSprite);
+        }
+
     }
     window.setView(oldView);
 }
@@ -2698,9 +2860,40 @@ void loop()
         world.assignPopulationToFactions();
     }
 
+    if(inputState.key[Key::M].time == 1)
+    {
+        sf::Clock factionTimer;
+        factionTimer.restart();
+
+        std::cout << "New Day; Think Time. \n";
+        for(auto &faction : world.factions)
+        {
+            if(!faction.get())
+            {
+                std::cout << "Failed to get\n";
+                continue;
+            }
+
+            std::cout << "Faction: " << faction->name << ", Buildings: " << faction->buildings.size() << std::endl;
+            faction->thinkDay();
+        }
+
+        std::cout << "End Day; Time Thunk: " << factionTimer.getElapsedTime().asMicroseconds() << std::endl;
+
+    }
+
+
     if(inputState.key[Key::Comma])
     {
-        gravitatePopulation();
+        int value1 = random(-50,50);
+        int value2 = random(-50,50);
+        std::cout << "V2: " << value2 << ", V2 Min 10: " << std::min(value2, 10) << ", V2 Max 0: " << std::max(value2,0) << std::endl;
+
+        for(int i = 0; i != 33; i++)
+        {
+            std::cout << "D?: " << i << ": " << ( i % 15) << std::endl;
+        }
+
     }
 
     renderBuildings();

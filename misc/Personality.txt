@@ -7,3 +7,29 @@ Cruel <-> Merciful
 Caring <-> Aloof
 Crude <-> Elegant
 Secrecy <-> Openness
+Simple <-> Exotic
+
+
+*Satisfaction*
+Each of these sliders has 'satisfied' bar that gradually creeps towards 0. Ranging from -100 to 100.
+The mood of the agent is effected by how satisfied all these bars are.
+Default of 0 means they are bored and unfulfilled, and may more readily seek actions that will satisfy their personality.
+Overall negative will put them in a bad mood, and may lash out in unpleasant manners. They will constantly seek actions to satisfy
+their personality.
+Each event they witness that raises or lowers a personality need is remembered, with a slow decay.
+If a faction commits a cruel action to them while they are merciful, they will have a massive negative relation
+with that faction. The value gradually decaying over time.
+If a friendly agent commits a Bright act to a Bright agent, the friendly agent will have a positive relation with that agent that
+will gradually decay over time.
+
+*Relations*
+Conversations and Relations will be effected by the personality.
+Agent A is Calm and Brooding
+Agent B is Calm and Bright
+Agent A speaks with Agent B, using Calm personality subtext. Assuming the subject isn't a conflict, they 
+will both like eachother more since they share the same personality aspect.
+(Increased odds of success, rather than outright success)
+
+Agent B speaks with Agent A, using Brooding subtext. Agent A is on the opposite end of this scale, and thus thinks less of
+Agent B.
+(Again, odds, not exact outright.)
