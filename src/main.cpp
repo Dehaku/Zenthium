@@ -169,8 +169,61 @@ public:
         }
     }
 };
-
 std::list<std::shared_ptr<Creature>> creatures;
+
+class Resource
+{
+public:
+    enum{Food,Water,Wood,Metal};
+    int type;
+    BigInteger amount;
+};
+
+class Building
+{
+public:
+    std::string name;
+    int id;
+    sf::Vector2i worldPos;
+    bool isHousing;
+    bool isShop;
+    bool isProduction;
+    std::shared_ptr<Faction> owner; // Null if public.
+
+    std::vector<Resource> produces;
+    std::vector<Resource> inventory;
+
+    void makeTownCenter()
+    {
+        name = "Town Center";
+
+        Resource itemProduction;
+        itemProduction.type = Resource::Food;
+        itemProduction.amount = 10;
+        produces.push_back(itemProduction);
+        itemProduction.type = Resource::Water;
+        itemProduction.amount = 10;
+        produces.push_back(itemProduction);
+        itemProduction.type = Resource::Wood;
+        itemProduction.amount = 5;
+        produces.push_back(itemProduction);
+        itemProduction.type = Resource::Metal;
+        itemProduction.amount = 1;
+        produces.push_back(itemProduction);
+    }
+
+    void makeFarm()
+    {
+        name = "Farm";
+
+        Resource itemProduction;
+        itemProduction.type = Resource::Food;
+        itemProduction.amount = 10;
+        produces.push_back(itemProduction);
+    }
+};
+
+
 class WorldTile
 {
 public:
@@ -298,6 +351,30 @@ public:
         int returnVar = needFood;
         returnVar += agents.size()*2;
         // Loop through buildings, reducing this number by food producers.
+
+        for(auto &prodBuilding : buildings)
+        {
+            if(!prodBuilding.get())
+            {
+                std::cout << "Failed to get\n";
+                continue;
+            }
+            sf::Vector2i buildingPos = prodBuilding->worldPos;
+
+            std::cout << prodBuilding->name << " produces... \n";
+            for(int i = 0; i != prodBuilding->produces.size(); i++)
+            {
+                std::cout << prodBuilding->produces[i].type << " : " << prodBuilding->produces[i].amount << std::endl;
+                if(prodBuilding->produces[i].type == Resource::Food)
+                    returnVar -= prodBuilding->produces[i].amount.toInt();
+
+            }
+        }
+
+
+
+
+        std::cout << "NeedFood == " << returnVar << std::endl;
         return returnVar;
     }
     int getNeedFoodConstructionless()
@@ -364,57 +441,8 @@ public:
 
 };
 
-class Resource
-{
-public:
-    enum{Food,Water,Wood,Metal};
-    int type;
-    BigInteger amount;
-};
 
-class Building
-{
-public:
-    std::string name;
-    int id;
-    sf::Vector2i worldPos;
-    bool isHousing;
-    bool isShop;
-    bool isProduction;
-    std::shared_ptr<Faction> owner; // Null if public.
 
-    std::vector<Resource> produces;
-    std::vector<Resource> inventory;
-
-    void makeTownCenter()
-    {
-        name = "Town Center";
-
-        Resource itemProduction;
-        itemProduction.type = Resource::Food;
-        itemProduction.amount = 10;
-        produces.push_back(itemProduction);
-        itemProduction.type = Resource::Water;
-        itemProduction.amount = 10;
-        produces.push_back(itemProduction);
-        itemProduction.type = Resource::Wood;
-        itemProduction.amount = 5;
-        produces.push_back(itemProduction);
-        itemProduction.type = Resource::Metal;
-        itemProduction.amount = 1;
-        produces.push_back(itemProduction);
-    }
-
-    void makeFarm()
-    {
-        name = "Farm";
-
-        Resource itemProduction;
-        itemProduction.type = Resource::Food;
-        itemProduction.amount = 10;
-        produces.push_back(itemProduction);
-    }
-};
 
 sf::Vector2i Faction::getFactionCenter()
 {
@@ -1437,7 +1465,8 @@ void Faction::processOrders()
                 int yPos = factionCenter.y+random(-reachRange,reachRange);
                 if(iterations == 2)
                     std::cout << xPos << ", " << yPos << std::endl;
-                sf::Vector2i buildingPos = sf::Vector2i(std::max(std::min(xPos,98),1),std::max(std::min(yPos,98),1));
+                sf::Vector2i buildingPos = sf::Vector2i(std::max(std::min(xPos,98),1),std::max(std::min(yPos,98),1)); // Came back after awhile, this feels like a bad solution to whatever this was meant to achieve.
+
                 if(iterations == 2)
                     std::cout << buildingPos.x << ", " << buildingPos.y << std::endl;
 
@@ -2578,7 +2607,7 @@ void setup()
     clock.restart();
 
     world.genWorldNoise();
-    std::cout << "World Gen:" << clock.getElapsedTime().asMicroseconds() << std::endl;
+    std::cout << "World Gen:" << clock.getElapsedTime().asSeconds() << "(" << clock.getElapsedTime().asMicroseconds() << ")" << std::endl;
     clock.restart();
 
     // for(int i = 0; i != 10; i++)
@@ -2588,7 +2617,7 @@ void setup()
     clock.restart();
 
     buildChunkImage();
-    std::cout << "World Image:" << clock.getElapsedTime().asMicroseconds() << std::endl;
+    std::cout << "World Image:" << clock.getElapsedTime().asSeconds() << "(" << clock.getElapsedTime().asMicroseconds() << ")" << std::endl;
 
     clock.restart();
     world.generateGeneralPopulation();
