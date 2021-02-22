@@ -95,6 +95,7 @@ public:
     sf::Vector2f worldPosPixel;
     std::shared_ptr<Faction> trueFaction; // For double agents, should be left empty unless active.
     std::shared_ptr<Faction> faction;
+    std::shared_ptr<Building> house;
 
 
 
@@ -174,7 +175,7 @@ std::list<std::shared_ptr<Creature>> creatures;
 class Resource
 {
 public:
-    enum{Food,Water,Wood,Metal};
+    enum{Food,Water,Wood,Metal,Trash,Waste};
     int type;
     BigInteger amount;
 };
@@ -186,9 +187,11 @@ public:
     int id;
     sf::Vector2i worldPos;
     bool isHousing;
+    int houseCapacity;
     bool isShop;
     bool isProduction;
     std::shared_ptr<Faction> owner; // Null if public.
+    std::list<std::shared_ptr<Creature>> occupants;
 
     std::vector<Resource> produces;
     std::vector<Resource> inventory;
@@ -212,6 +215,22 @@ public:
         produces.push_back(itemProduction);
     }
 
+    void makeIntoBuilding(int buildingType)
+    {
+
+
+        if(buildingType == 1) // 1 Farm
+            makeFarm();
+        /*
+        else if(buildingType == 2) // 2 Commercial
+            makeBusiness();
+        else if(buildingType == 3) // 3 Industrial
+            makeProduction();
+            */
+        else if(buildingType == 4) // 4 Mass Housing
+            makeMassHousing();
+    }
+
     void makeFarm()
     {
         name = "Farm";
@@ -220,6 +239,13 @@ public:
         itemProduction.type = Resource::Food;
         itemProduction.amount = 10;
         produces.push_back(itemProduction);
+    }
+
+    void makeMassHousing()
+    {
+        name = "Mass Housing";
+        isHousing = true;
+        houseCapacity = 4;
     }
 };
 
@@ -320,7 +346,7 @@ public:
 
     bool toDelete;
     // Slot 0, Order type: 0 None, 1 Build, 2 Destroy, 3 Assassinate, 4 Kidnap, 5 Scout, 6 Seduce
-    // Slot 1, Build: 1 Farm, 2 Commercial, 3 Industrial
+    // Slot 1, Build: 1 Farm, 2 Commercial, 3 Industrial, 4 Mass Housing
     // Slot 1, Assassinate:
 
     // Build, Slot 1, Building to produce
@@ -385,7 +411,32 @@ public:
         return returnVar;
     }
 
-    int getNeedHousing();
+
+
+    int getNeedHousing()
+    { // This returns the faction's need for housing, with housing projects in mind.
+        int returnVar = needHousing;
+        returnVar += agents.size();
+        // Loop through buildings, reducing this number by available rooms.
+
+        for(auto &prodBuilding : buildings)
+        {
+            if(!prodBuilding.get())
+            {
+                std::cout << "Failed to get\n";
+                continue;
+            }
+
+            if(prodBuilding->isHousing)
+                returnVar -= prodBuilding->houseCapacity;
+        }
+
+
+
+
+        std::cout << "NeedHousing == " << returnVar << std::endl;
+        return returnVar;
+    }
     int getNeedHousingConstructionless();
 
     int getNeedWeapons();
@@ -402,6 +453,13 @@ public:
             FactionOrder FO;
             FO.subInfo[0] = 1; // Build
             FO.subInfo[1] = 1; // Farm
+            orders.push_back(FO);
+        }
+        if(getNeedHousing() > 0)
+        {
+            FactionOrder FO;
+            FO.subInfo[0] = 1; // Build
+            FO.subInfo[1] = 4; // Mass Housing
             orders.push_back(FO);
         }
 
@@ -1428,7 +1486,7 @@ bool growTerritories(bool skipGrowGraphics = false) // returns true when nothing
 
 void Faction::processOrders()
 {
-    std::cout << "Wee. \n";
+    std::cout << "processOrders. \n";
 
     for(auto &order : orders)
     {
@@ -1476,7 +1534,7 @@ void Faction::processOrders()
                     world.tiles[buildingPos.x][buildingPos.y].builtOn = true;
 
                     std::shared_ptr<Building> building = std::make_shared<Building>();
-                    building->makeFarm();
+                    building->makeIntoBuilding(order.subInfo[1]);
                     building->worldPos = buildingPos;
                     world.buildings.push_back(building);
 
@@ -2796,6 +2854,11 @@ void renderBuildings()
     buildingFarmSprite.setTexture(*buildingFarmTexture);
     buildingFarmSprite.setScale(0.5f,0.5f);
 
+    sf::Texture *buildingMassHousingTexture = &texturemanager.getTexture("mapBuilding_Housing.png");
+    sf::Sprite buildingMassHousingSprite;
+    buildingMassHousingSprite.setTexture(*buildingMassHousingTexture);
+    buildingMassHousingSprite.setScale(0.5f,0.5f);
+
 
     // Establishing before hand since creating and destroying one per loop is 'probably' slower than overwriting one each time.
     sf::Vector2f posQuickCheck;
@@ -2836,6 +2899,12 @@ void renderBuildings()
         {
             buildingFarmSprite.setPosition(buildingPos);
             window.draw(buildingFarmSprite);
+        }
+
+        if(building->name == "Mass Housing")
+        {
+            buildingMassHousingSprite.setPosition(buildingPos);
+            window.draw(buildingMassHousingSprite);
         }
 
     }
