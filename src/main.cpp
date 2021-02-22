@@ -175,9 +175,27 @@ std::list<std::shared_ptr<Creature>> creatures;
 class Resource
 {
 public:
-    enum{Food,Water,Wood,Metal,Trash,Waste};
+    enum{Food,Water,Wood,Metal,Trash,Waste,Labor};
     int type;
     BigInteger amount;
+};
+
+class ProductionBill
+{
+public:
+    // This is effectively a work order in a building to make things.
+    // e.g. a Farm has a bill with a product of 10 Food with a cost of 1 Water and 5 Labor.
+    // Once the bill's Cost is met, it's product is added to the building's inventory.
+    // The CostUntouched is used as a reference for UI displays, as Cost is used as the tracker to produce the product.
+    Resource product; // (Resource::Food) ect
+    std::vector<Resource> Cost;
+    std::vector<Resource> CostUntouched;
+    bool removeThisBillOnCompletion;
+
+    ProductionBill()
+    {
+        removeThisBillOnCompletion = false;
+    }
 };
 
 class Building
@@ -239,6 +257,20 @@ public:
         itemProduction.type = Resource::Food;
         itemProduction.amount = 10;
         produces.push_back(itemProduction);
+
+        ProductionBill bill;
+        bill.product = itemProduction;
+
+        Resource itemCost;
+        itemCost.type = Resource::Labor;
+        itemCost.amount = 5;
+        bill.Cost.push_back(itemCost);
+        bill.CostUntouched.push_back(itemCost);
+
+        itemCost.type = Resource::Water;
+        itemCost.amount = 1;
+        bill.Cost.push_back(itemCost);
+        bill.CostUntouched.push_back(itemCost);
     }
 
     void makeMassHousing()
