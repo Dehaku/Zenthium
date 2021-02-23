@@ -508,6 +508,8 @@ public:
 
     void processOrders();
 
+    void processBuildings();
+
     sf::Vector2i getFactionCenter();
 
     void thinkDay()
@@ -528,12 +530,39 @@ public:
         }
 
         processOrders();
+
+        processBuildings();
+
     }
 
     std::list<std::shared_ptr<Creature>> agents;
     std::list<std::shared_ptr<Building>> buildings;
 
     std::list<FactionOrder> orders;
+
+    std::shared_ptr<Creature> getRandomAgent()
+    {
+        int randomEntry = random(0,agents.size()-1);
+        int tracker = 0;
+        for (auto const& i : agents) {
+            if(tracker == randomEntry)
+            {
+                if(!i.get())
+                {
+                    std::cout << "Failed to get during random agent \n";
+                    continue;
+                }
+                std::cout << i->name << "Random agent chosen: " << randomEntry << " of " << agents.size() << std::endl;
+
+                return i;
+            }
+
+            tracker++;
+        }
+
+
+
+    }
 
     Faction()
     {
@@ -1612,6 +1641,73 @@ void Faction::processOrders()
 
     }
     AnyDeletes(orders);
+
+}
+
+void Faction::processBuildings()
+{
+    std::cout << "processBuildings. \n";
+
+    for(auto &building : buildings)
+    {
+        if(!building.get())
+        {
+            std::cout << "Failed to get\n";
+            continue;
+        }
+        if(building->owners.empty()) // Giving ownership of building to someone.
+        {
+            std::cout << building->name << ": No owner. \n";
+            std::shared_ptr<Creature> potentialOwner;
+            potentialOwner = getRandomAgent(); // Grab a random civilian of the faction to make into the owner.
+
+            if(!potentialOwner->buildingsOwned.empty()) // If the random civvie already owns a business, go through list until you find one that doesn't.
+            {
+                for(auto &agent : agents)
+                {
+                    if(!agent.get())
+                    {
+                        std::cout << "Failed to get\n";
+                        continue;
+                    }
+                    if(agent->buildingsOwned.size() != 0)
+                    {
+                        std::cout << "Giving " << building->name << " to " << agent->name << std::endl;
+                        building->owners.push_back(agent);
+                        agent->buildingsOwned.push_back(building);
+                    }
+                }
+            }
+            else
+            {
+                // give business to random
+                std::cout << "Giving " << building->name << " to " << potentialOwner->name << std::endl;
+                building->owners.push_back(potentialOwner);
+                potentialOwner->buildingsOwned.push_back(building);
+            }
+
+            if(building->owners.empty()) // If we STILL couldn't find someone to make the owner... give that original random civvie the business.
+            {
+                std::cout << "Giving " << building->name << " to " << potentialOwner->name << std::endl;
+                building->owners.push_back(potentialOwner);
+                potentialOwner->buildingsOwned.push_back(building);
+            }
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+    }
+
+
 
 }
 
