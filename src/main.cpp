@@ -95,7 +95,11 @@ public:
     sf::Vector2f worldPosPixel;
     std::shared_ptr<Faction> trueFaction; // For double agents, should be left empty unless active.
     std::shared_ptr<Faction> faction;
+
+    std::list<std::shared_ptr<Building>> buildingsOwned;
     std::shared_ptr<Building> house;
+    std::shared_ptr<Building> work;
+
 
 
 
@@ -175,9 +179,11 @@ std::list<std::shared_ptr<Creature>> creatures;
 class Resource
 {
 public:
-    enum{Food,Water,Wood,Metal,Trash,Waste,Labor};
+    enum{Food,Water,Wood,Metal,Trash,Waste,Labor,Construction};
     int type;
     BigInteger amount;
+    // Construction is unique, when it's amount is 0, it simply finishes a building's construction status, setting underConstruction to false.
+    // When it's above 0, when the bill is completed, the building will be remade into whatever building has that ID. (Just future proofing, may not use it.)
 };
 
 class ProductionBill
@@ -210,10 +216,13 @@ public:
     bool isProduction;
     bool underConstruction;
     std::shared_ptr<Faction> owner; // Null if public.
+    std::list<std::shared_ptr<Creature>> owners;
     std::list<std::shared_ptr<Creature>> occupants;
+    std::list<std::shared_ptr<Creature>> workers;
 
     std::vector<Resource> produces;
-    std::vector<Resource> inventory;
+    std::list<Resource> inventory;
+    std::list<ProductionBill> bills;
 
     void makeTownCenter()
     {
@@ -261,6 +270,23 @@ public:
         itemProduction.amount = 10;
         produces.push_back(itemProduction);
 
+        // Construct Building bill
+        ProductionBill ConstructBill;
+        ConstructBill.product.type = Resource::Construction;
+        ConstructBill.product.amount = 0; // 0 just turns off the 'underConstruction' bool. Higher numbers turn the building into that building.
+
+        Resource constructCost;
+        constructCost.type = Resource::Labor;
+        constructCost.amount = 5;
+
+        ConstructBill.Cost.push_back(constructCost);
+        ConstructBill.CostUntouched.push_back(constructCost);
+
+        ConstructBill.removeThisBillOnCompletion = true;
+        bills.push_back(ConstructBill);
+
+
+        // Normal food growing bill
         ProductionBill bill;
         bill.product = itemProduction;
 
@@ -274,6 +300,8 @@ public:
         itemCost.amount = 1;
         bill.Cost.push_back(itemCost);
         bill.CostUntouched.push_back(itemCost);
+
+        bills.push_back(bill);
     }
 
     void makeMassHousing()
