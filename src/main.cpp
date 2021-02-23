@@ -208,6 +208,7 @@ public:
     int houseCapacity;
     bool isShop;
     bool isProduction;
+    bool underConstruction;
     std::shared_ptr<Faction> owner; // Null if public.
     std::list<std::shared_ptr<Creature>> occupants;
 
@@ -217,6 +218,7 @@ public:
     void makeTownCenter()
     {
         name = "Town Center";
+        underConstruction = false;
 
         Resource itemProduction;
         itemProduction.type = Resource::Food;
@@ -253,6 +255,7 @@ public:
     {
         name = "Farm";
 
+        underConstruction = true;
         Resource itemProduction;
         itemProduction.type = Resource::Food;
         itemProduction.amount = 10;
@@ -276,6 +279,7 @@ public:
     void makeMassHousing()
     {
         name = "Mass Housing";
+        underConstruction = true;
         isHousing = true;
         houseCapacity = 4;
     }
@@ -2891,9 +2895,17 @@ void renderBuildings()
     buildingMassHousingSprite.setTexture(*buildingMassHousingTexture);
     buildingMassHousingSprite.setScale(0.5f,0.5f);
 
+    sf::Texture *buildingUnderConstructionTexture = &texturemanager.getTexture("mapBuilding_Construction.png");
+    sf::Sprite buildingUnderConstructionSprite;
+    buildingUnderConstructionSprite.setTexture(*buildingUnderConstructionTexture);
+    buildingUnderConstructionSprite.setScale(0.5f,0.5f);
+
 
     // Establishing before hand since creating and destroying one per loop is 'probably' slower than overwriting one each time.
     sf::Vector2f posQuickCheck;
+
+    sf::Color underConstructionColor(100,100,100,150);
+    sf::Color builtColor(255,255,255);
 
     for(auto &building : world.buildings)
     {
@@ -2927,17 +2939,35 @@ void renderBuildings()
             window.draw(townCenterSprite);
         }
 
-        if(building->name == "Farm")
+        else if(building->name == "Farm")
         {
+            if(building->underConstruction)
+                buildingFarmSprite.setColor(underConstructionColor);
+            else
+                buildingFarmSprite.setColor(builtColor);
+
             buildingFarmSprite.setPosition(buildingPos);
             window.draw(buildingFarmSprite);
         }
 
-        if(building->name == "Mass Housing")
+        else if(building->name == "Mass Housing")
         {
+            if(building->underConstruction)
+                buildingMassHousingSprite.setColor(underConstructionColor);
+            else
+                buildingMassHousingSprite.setColor(builtColor);
+
             buildingMassHousingSprite.setPosition(buildingPos);
             window.draw(buildingMassHousingSprite);
         }
+
+        if(building->underConstruction)
+        {
+            buildingUnderConstructionSprite.setPosition(buildingPos);
+            window.draw(buildingUnderConstructionSprite);
+        }
+
+
 
     }
     window.setView(oldView);
