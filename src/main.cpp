@@ -1661,8 +1661,15 @@ void Faction::processBuildings()
             std::shared_ptr<Creature> potentialOwner;
             potentialOwner = getRandomAgent(); // Grab a random civilian of the faction to make into the owner.
 
-            if(!potentialOwner->buildingsOwned.empty()) // If the random civvie already owns a business, go through list until you find one that doesn't.
-            {
+            if(potentialOwner->buildingsOwned.empty())
+            { // give business to random
+
+                std::cout << "Giving " << building->name << " to " << potentialOwner->name << std::endl;
+                building->owners.push_back(potentialOwner);
+                potentialOwner->buildingsOwned.push_back(building);
+            }
+            else
+            { // If the random civvie already owns a business, go through list until you find one that doesn't.
                 for(auto &agent : agents)
                 {
                     if(!agent.get())
@@ -1670,20 +1677,15 @@ void Faction::processBuildings()
                         std::cout << "Failed to get\n";
                         continue;
                     }
-                    if(agent->buildingsOwned.size() != 0)
+                    if(agent->buildingsOwned.empty())
                     {
                         std::cout << "Giving " << building->name << " to " << agent->name << std::endl;
                         building->owners.push_back(agent);
                         agent->buildingsOwned.push_back(building);
+
+                        break;
                     }
                 }
-            }
-            else
-            {
-                // give business to random
-                std::cout << "Giving " << building->name << " to " << potentialOwner->name << std::endl;
-                building->owners.push_back(potentialOwner);
-                potentialOwner->buildingsOwned.push_back(building);
             }
 
             if(building->owners.empty()) // If we STILL couldn't find someone to make the owner... give that original random civvie the business.
@@ -1691,24 +1693,10 @@ void Faction::processBuildings()
                 std::cout << "Giving " << building->name << " to " << potentialOwner->name << std::endl;
                 building->owners.push_back(potentialOwner);
                 potentialOwner->buildingsOwned.push_back(building);
+
             }
-
-
         }
-
-
-
-
-
-
-
-
-
-
     }
-
-
-
 }
 
 class WorldMenu
