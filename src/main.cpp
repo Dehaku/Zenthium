@@ -1618,7 +1618,7 @@ public:
     }
 
     void assignPopulationToFactions()
-    {
+    { // This might need to be flipped to have agent compare nearest buildings to be assigned to a faction instead.
         for(auto &faction : factions)
             for(auto &building : faction->buildings)
         {
@@ -1635,7 +1635,7 @@ public:
             for(auto &agent : genPop)
             {
                 // Creature.worldPosPixel
-                if(math::distance(agent->worldPosPixel,buildingPos) <= 300)
+                if(math::distance(agent->worldPosPixel,buildingPos) <= 70)
                 {
                     faction->agents.push_back(agent);
                     agent->faction = faction;
