@@ -16,6 +16,10 @@
 #include "Camera.h"
 #include "FastNoise.h"
 
+// TODO: Lighting system https://miguelmj.github.io/Candle/   https://en.sfml-dev.org/forums/index.php?topic=27631.0
+// TODO: ImGui, In case SFGUI falls apart. https://en.sfml-dev.org/forums/index.php?topic=20137.0
+
+
 class MemAndCPUTracker
 { // If someone is making this multiplatform, Linux and Mac OS X versions here; https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
 public:
@@ -2431,10 +2435,364 @@ public:
 };
 std::list<std::shared_ptr<GenPopMenu>> genPopMenus;
 
-void genPopMenuRefreshChecker()
+class MenuAgentWorkProperties
+{ // Broken, Doesn't properly wipe old property entries for some reason. Should just make a new one as a tab on a 'character' page. Stats|Gear|Home&Work|Properties
+public:
+    sfg::Window::Ptr sfGuiwindow;
+    sfg::Label::Ptr sel_label;
+    sfg::Box::Ptr scrolled_window_box;
+    sfg::ScrolledWindow::Ptr scrolledwindow;
+    sfg::Label::Ptr page_label;
+    sfg::ComboBox::Ptr combo_boxSortList;
+
+    bool needsRefresh = false;
+    int pageStart = 0; // We only show 100 entries at a time.
+
+    std::vector<std::shared_ptr<Building>> genPopVector;
+
+    void populatePopulationBox()
+    {
+        sf::Clock clocker;
+        int devCounter = 0;
+        clocker.restart();
+        for(auto &agent : genPopVector)
+        {
+            devCounter++;
+            if(devCounter < pageStart)
+                continue;
+            if(devCounter > pageStart+99)
+                break;
+
+
+            std::string agentName;
+            std::string agentType;
+            std::string agentZen;
+            std::string agentFaction;
+            agentName.append(agent->name);
+
+            agentType.append("Type: ");
+            {
+                if(agent->isHousing)
+                    agentType.append(" Housing ");
+                if(agent->isProduction)
+                    agentType.append(" Production");
+                if(agent->isShop)
+                    agentType.append(" Shop ");
+                if(agent->underConstruction)
+                    agentType.append(" *Under Construction* ");
+            }
+            agentZen.append("Zen: ");
+            //agentZen.append(std::to_string(agent->getTotalZenthiumInfused().toInt()));
+            agentFaction.append("Faction: ");
+            if(!agent->owner.get())
+                agentFaction.append("None");
+            else
+                agentFaction.append(agent->owner->name);
+
+
+            auto agentNameLabel = sfg::Label::Create(agentName);
+            auto fixedNameLabel = sfg::Fixed::Create();
+            fixedNameLabel->Put(agentNameLabel,sf::Vector2f(5,0));
+
+
+
+            auto agentTypeLabel = sfg::Label::Create(agentType);
+            auto fixedTypeLabel = sfg::Fixed::Create();
+            fixedTypeLabel->Put(agentTypeLabel,sf::Vector2f(70,0));
+
+            auto agentZenLabel = sfg::Label::Create(agentZen);
+            auto fixedZenLabel = sfg::Fixed::Create();
+            fixedZenLabel->Put(agentZenLabel,sf::Vector2f(50,0));
+
+            auto agentFactionLabel = sfg::Label::Create(agentFaction);
+            auto fixedFactionLabel = sfg::Fixed::Create();
+            fixedFactionLabel->Put(agentFactionLabel,sf::Vector2f(50,0));
+
+            auto hbox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL);
+
+            hbox->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+            {
+                std::cout << "Hi! I'm " << agent->name << ", Nice to meet you! \n";
+
+            } );
+
+            fixedFactionLabel->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+            {
+                if(!agent->owner.get())
+                    std::cout << "and I'm with no one, woo? \n";
+                else
+                    std::cout << "and I'm with " << agent->owner->name << ", woo? \n";
+
+            } );
+
+
+
+            hbox->Pack( fixedNameLabel );
+            hbox->Pack( fixedTypeLabel );
+            hbox->Pack( fixedZenLabel );
+            hbox->Pack( fixedFactionLabel );
+
+            scrolled_window_box->Pack( hbox );
+        }
+    }
+
+    void wipePopulationBox()
+    {
+        scrolled_window_box->RemoveAll();
+    }
+
+    void buildMenu(std::shared_ptr<Creature> owner)
+    {
+        genPopVector.clear();
+        sfGuiwindow->RemoveAll();
+
+        if(!owner.get())
+        {
+            std::cout << "Failed to get\n";
+            return;
+        }
+
+
+        sfGuiwindow->SetTitle( owner->name + " Work & Properties" );
+
+
+        sf::Clock clocker;
+        if(genPopVector.empty())
+        {
+            clocker.restart();
+            for(auto &agent : owner->buildingsOwned)
+                genPopVector.push_back(agent);
+
+            std::cout << "T: " << clocker.getElapsedTime().asMicroseconds() << std::endl;
+        }
+
+
+
+        auto mainBox = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 10.f );
+        scrolled_window_box = sfg::Box::Create( sfg::Box::Orientation::VERTICAL );
+
+        combo_boxSortList = sfg::ComboBox::Create();
+        combo_boxSortList->AppendItem( "Choose Sort Method" );
+        combo_boxSortList->SelectItem(0);
+        combo_boxSortList->AppendItem( "----------" );
+        combo_boxSortList->AppendItem( "(N/A)Sort: Name - Ascending" );
+        combo_boxSortList->AppendItem( "(N/A)Sort: Name - Descending" );
+        combo_boxSortList->AppendItem( "Sort: Type - Ascending" );
+        combo_boxSortList->AppendItem( "Sort: Type - Descending" );
+        combo_boxSortList->AppendItem( "Sort: Total Zen Infused - Ascending" );
+        combo_boxSortList->AppendItem( "Sort: Total Zen Infused - Descending" );
+
+        combo_boxSortList->GetSignal( sfg::ComboBox::OnSelect ).Connect( [&] {
+
+            // These apply to all sort methods.
+            std::vector<std::shared_ptr<Building>> &num = genPopVector;
+            int i, flag = 1, numLength = num.size();
+            std::shared_ptr<Building> tempShape;
+            int d = numLength;
+            // Actual sorting. Not sure how to reduce redundancy further.
+            if(combo_boxSortList->GetSelectedItem() == 4)
+            { // Type Ascending
+                /*
+                while( flag || (d > 1))      // boolean flag (true when not equal to 0)
+                {
+                    flag = 0;           // reset flag to 0 to check for future swaps
+                    d = (d+1) / 2;
+                    for (i = 0; i < (numLength - d); i++)
+                    {
+                        if (num[i + d]->type < num[i]->type) // This is the actual 'sorting' method.
+                        {
+                            tempShape = num[i + d];      // swap positions i+d and i
+                            num[i + d] = num[i];
+                            num[i] = tempShape;
+                            flag = 1;                  // tells swap has occurred
+                        }
+                    }
+                }
+                */
+                needsRefresh = true;
+            }
+
+            if(combo_boxSortList->GetSelectedItem() == 5)
+            { // Type Descending
+                /*
+                while( flag || (d > 1))      // boolean flag (true when not equal to 0)
+                {
+                    flag = 0;           // reset flag to 0 to check for future swaps
+                    d = (d+1) / 2;
+                    for (i = 0; i < (numLength - d); i++)
+                    {
+                        if (num[i + d]->type > num[i]->type) // This is the actual 'sorting' method.
+                        {
+                            tempShape = num[i + d];      // swap positions i+d and i
+                            num[i + d] = num[i];
+                            num[i] = tempShape;
+                            flag = 1;                  // tells swap has occurred
+                        }
+                    }
+                }
+                */
+                needsRefresh = true;
+            }
+
+            if(combo_boxSortList->GetSelectedItem() == 6)
+            { // Zen Infused Ascending
+                /*
+                while( flag || (d > 1))      // boolean flag (true when not equal to 0)
+                {
+                    flag = 0;           // reset flag to 0 to check for future swaps
+                    d = (d+1) / 2;
+                    for (i = 0; i < (numLength - d); i++)
+                    {
+                        if (num[i + d]->getTotalZenthiumInfused() < num[i]->getTotalZenthiumInfused()) // This is the actual 'sorting' method.
+                        {
+                            tempShape = num[i + d];      // swap positions i+d and i
+                            num[i + d] = num[i];
+                            num[i] = tempShape;
+                            flag = 1;                  // tells swap has occurred
+                        }
+                    }
+                }
+                */
+                needsRefresh = true;
+            }
+
+            if(combo_boxSortList->GetSelectedItem() == 7)
+            { // Zen Infused Descending
+                /*
+                while( flag || (d > 1))      // boolean flag (true when not equal to 0)
+                {
+                    flag = 0;           // reset flag to 0 to check for future swaps
+                    d = (d+1) / 2;
+                    for (i = 0; i < (numLength - d); i++)
+                    {
+                        if (num[i + d]->getTotalZenthiumInfused() > num[i]->getTotalZenthiumInfused()) // This is the actual 'sorting' method.
+                        {
+                            tempShape = num[i + d];      // swap positions i+d and i
+                            num[i + d] = num[i];
+                            num[i] = tempShape;
+                            flag = 1;                  // tells swap has occurred
+                        }
+                    }
+                }
+                */
+                needsRefresh = true;
+            }
+        } );
+
+
+        clocker.restart();
+        populatePopulationBox();
+
+        scrolledwindow = sfg::ScrolledWindow::Create();
+        scrolledwindow->SetScrollbarPolicy( sfg::ScrolledWindow::HORIZONTAL_ALWAYS | sfg::ScrolledWindow::VERTICAL_ALWAYS );
+
+        scrolledwindow->AddWithViewport( scrolled_window_box );
+        scrolledwindow->SetRequisition( sf::Vector2f( 500.f, 400.f ) );
+
+        auto buttonBox = sfg::Box::Create();
+        buttonBox->Pack(combo_boxSortList);
+
+        auto pageButtonBox = sfg::Box::Create();
+
+        auto pageExtremeLeftButton = sfg::Button::Create( "<<<" );
+        pageExtremeLeftButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+        {
+            if(pageStart > 900)
+            {
+                pageStart -= 1000;
+                page_label->SetText(std::to_string(pageStart) + " - " + std::to_string(pageStart+100));
+                needsRefresh = true;
+            }
+
+        } );
+
+        auto pageLeftButton = sfg::Button::Create( "<" );
+        pageLeftButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+        {
+            if(pageStart > 0)
+            {
+                pageStart -= 100;
+                page_label->SetText(std::to_string(pageStart) + " - " + std::to_string(pageStart+100));
+                needsRefresh = true;
+            }
+
+        } );
+
+        auto pageText_label = sfg::Label::Create("Page: ");
+
+        page_label = sfg::Label::Create(std::to_string(pageStart) + " - " + std::to_string(pageStart+100));
+
+        auto pageRightButton = sfg::Button::Create( ">" );
+        pageRightButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+        {
+            if(pageStart < world.genPop.size()-100)
+            {
+                pageStart += 100;
+                page_label->SetText(std::to_string(pageStart) + " - " + std::to_string(pageStart+100));
+                needsRefresh = true;
+            }
+        } );
+
+        auto pageExtremeRightButton = sfg::Button::Create( ">>>" );
+        pageExtremeRightButton->GetSignal( sfg::Widget::OnLeftClick ).Connect( [&]
+        {
+            if(pageStart < world.genPop.size()-1000)
+            {
+                pageStart += 1000;
+                page_label->SetText(std::to_string(pageStart) + " - " + std::to_string(pageStart+100));
+                needsRefresh = true;
+            }
+        } );
+
+        pageButtonBox->Pack(pageExtremeLeftButton);
+        pageButtonBox->Pack(pageLeftButton);
+        pageButtonBox->Pack(pageText_label);
+        pageButtonBox->Pack(page_label);
+        pageButtonBox->Pack(pageRightButton);
+        pageButtonBox->Pack(pageExtremeRightButton);
+
+
+        mainBox->Pack( buttonBox, false, true );
+        mainBox->Pack( scrolledwindow, true, true );
+        mainBox->Pack( pageButtonBox, false, false);
+        // Add the box to the window.
+        sfGuiwindow->Add( mainBox );
+
+
+
+        sfGuiwindow->Update( 0.f );
+    }
+
+    MenuAgentWorkProperties()
+    {
+        sfGuiwindow = sfg::Window::Create();
+    }
+};
+std::list<std::shared_ptr<MenuAgentWorkProperties>> menuAgentWorkProperties;
+
+void MenuRefreshChecker()
 {
 
     for(auto &menu : genPopMenus)
+        if(menu.get()->needsRefresh)
+    {
+        // TODO: Add options menu to make the Refresh() optional, it slows down menu pages, but makes it so you don't have to click to refresh scroll bar.
+         // Option 1: Wipe all, MS 17000-19000
+        // menu.get()->sfGuiwindow->RemoveAll();
+        // menu.get()->buildMenu();
+
+
+        // Option 2: Wipe only pop box, keeps sort option displayed. MS 85000-190000
+        menu.get()->wipePopulationBox();
+        menu.get()->populatePopulationBox();
+
+        // Option 3: All features, slowest by far. MS 323000-401000
+        menu.get()->scrolledwindow->Refresh( );
+
+        menu.get()->needsRefresh = false;
+    }
+
+    for(auto &menu : menuAgentWorkProperties)
         if(menu.get()->needsRefresh)
     {
         // TODO: Add options menu to make the Refresh() optional, it slows down menu pages, but makes it so you don't have to click to refresh scroll bar.
@@ -3223,11 +3581,66 @@ void renderBuildings()
 void mouseHoverOnCreature()
 {
     std::weak_ptr<Creature> closestCreature;
+
     for(auto &agent : world.genPop)
     {
-        // if(closestCreature )
+
+        if(closestCreature.lock() == nullptr)
+            closestCreature = agent;
+
+        if(math::distance(gvars::mousePos, agent->worldPosPixel) < math::distance(gvars::mousePos,closestCreature.lock()->worldPosPixel))
+            closestCreature = agent;
 
     }
+
+
+    if(auto creature = closestCreature.lock())
+    {
+        if(math::distance(gvars::mousePos,creature->worldPosPixel) < 5)
+        {
+            if(inputState.lmb && 2 == 1) // Don't use this for now, it's broken.
+            {
+                std::shared_ptr<MenuAgentWorkProperties> agentPropertiesMenu = std::make_shared<MenuAgentWorkProperties>();
+                menuAgentWorkProperties.push_back(agentPropertiesMenu);
+                menuAgentWorkProperties.back().get()->buildMenu(creature);
+            }
+
+            // Draw info when hovering over them.
+            shapes.createLine(gvars::mousePos.x,gvars::mousePos.y,creature->worldPosPixel.x,creature->worldPosPixel.y,2,sf::Color::Cyan);
+            shapes.createText(gvars::mousePos.x,gvars::mousePos.y-15,10,sf::Color::White,creature->name);
+
+
+            if(!creature->buildingsOwned.empty())
+            { // Draw lines and circles around buildings owned.
+                for(auto &owned : creature->buildingsOwned)
+                {
+                    auto &refBuilding = owned;
+                    shapes.createLine((refBuilding->worldPos.x*32)+16,(refBuilding->worldPos.y*32)+16,creature->worldPosPixel.x,creature->worldPosPixel.y,2,sf::Color::Blue);
+                    shapes.createText(refBuilding->worldPos.x*32,(refBuilding->worldPos.y*32)-15,10,sf::Color::Blue,"Own");
+                    shapes.createCircle((refBuilding->worldPos.x*32)+16,(refBuilding->worldPos.y*32)+16,10,sf::Color::Transparent,2,sf::Color::Blue);
+                }
+            }
+            if(creature->work.get())
+            { // Draw line and circle around work place.
+                auto &refBuilding = creature->work;
+                shapes.createLine((refBuilding->worldPos.x*32)+16,(refBuilding->worldPos.y*32)+16,creature->worldPosPixel.x,creature->worldPosPixel.y,2,sf::Color::Green);
+                shapes.createText(refBuilding->worldPos.x*32,(refBuilding->worldPos.y*32)-25,10,sf::Color::Green,"Work");
+                shapes.createCircle((refBuilding->worldPos.x*32)+16,(refBuilding->worldPos.y*32)+16,14,sf::Color::Transparent,2,sf::Color::Green);
+            }
+            if(creature->house.get())
+            { // Draw line and circle around house.
+                auto &refBuilding = creature->house;
+                shapes.createLine((refBuilding->worldPos.x*32)+16,(refBuilding->worldPos.y*32)+16,creature->worldPosPixel.x,creature->worldPosPixel.y,2,sf::Color::Red);
+                shapes.createText(refBuilding->worldPos.x*32,(refBuilding->worldPos.y*32)-35,10,sf::Color::Red,"House");
+                shapes.createCircle((refBuilding->worldPos.x*32)+16,(refBuilding->worldPos.y*32)+16,18,sf::Color::Transparent,2,sf::Color::Red);
+            }
+
+
+
+        }
+
+    }
+
 }
 
 
@@ -3235,7 +3648,7 @@ void loop()
 {
     applyCamera();
     updateMousePos();
-    genPopMenuRefreshChecker();
+    MenuRefreshChecker();
 
     if(inputState.key[Key::Space].time == 1)
         attributesMenu.displayStored();
@@ -3383,6 +3796,7 @@ sf::RenderWindow window(sf::VideoMode(1280, 720), "Zenthium");
 int main()
 {
     MemAndCPU.init();
+    mouseHoverOnCreature();
 
 
 
@@ -3481,6 +3895,9 @@ int main()
 
             for(auto &menu : genPopMenus)
                 menu.get()->sfGuiwindow->HandleEvent( event );
+
+            for(auto &menu : menuAgentWorkProperties)
+                menu.get()->sfGuiwindow->HandleEvent( event );
             // Close window : exit
             if (event.type == sf::Event::Closed)
                 window.close();
@@ -3512,6 +3929,9 @@ int main()
                 menu.get()->sfGuiwindow->Update( static_cast<float>( clock.getElapsedTime().asMicroseconds() ) / 1000000.f );
 
             for(auto &menu : genPopMenus)
+                menu.get()->sfGuiwindow->Update( static_cast<float>( clock.getElapsedTime().asMicroseconds() ) / 1000000.f );
+
+            for(auto &menu : menuAgentWorkProperties)
                 menu.get()->sfGuiwindow->Update( static_cast<float>( clock.getElapsedTime().asMicroseconds() ) / 1000000.f );
 
 			clock.restart();
