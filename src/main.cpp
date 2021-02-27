@@ -3,6 +3,8 @@
 #include <memory>
 #include <list>
 #include <vector>
+#include "windows.h" // Currently, this is only included for CPU and Memory tracking class. Can be stripped or use following as reference; // If someone is making this multiplatform, Linux and Mac OS X versions here; https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+#include <psapi.h>
 #include <SFGUI/SFGUI.hpp>
 #include <SFGUI/Widgets.hpp>
 
@@ -13,6 +15,121 @@
 #include "Shapes.h"
 #include "Camera.h"
 #include "FastNoise.h"
+
+class MemAndCPUTracker
+{ // If someone is making this multiplatform, Linux and Mac OS X versions here; https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+public:
+    ULARGE_INTEGER lastCPU, lastSysCPU, lastUserCPU;
+    int numProcessors;
+    HANDLE self;
+    std::vector<double> CPUAverage;
+
+    DWORDLONG getTotalVirtualMem()
+    {
+        MEMORYSTATUSEX memInfo;
+        memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+        GlobalMemoryStatusEx(&memInfo);
+        return memInfo.ullTotalPageFile;
+    }
+
+    DWORDLONG getVirtualMemUsedBySystem()
+    {
+        MEMORYSTATUSEX memInfo;
+        memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+        GlobalMemoryStatusEx(&memInfo);
+        return memInfo.ullTotalPageFile - memInfo.ullAvailPageFile;
+    }
+
+    SIZE_T GetVirtualMemUsedByThisProgram()
+    {
+        PROCESS_MEMORY_COUNTERS_EX pmc;
+        GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+        return pmc.PrivateUsage;
+    }
+
+    std::string GetMemReadout()
+    {
+        std::string MemUsed;
+        MemUsed = std::to_string(GetVirtualMemUsedByThisProgram());
+
+        if(MemUsed.length() > 12)
+            MemUsed.insert(MemUsed.length()-12,"Hi Future. :) tb ");
+        if(MemUsed.length() > 9)
+            MemUsed.insert(MemUsed.length()-9,"gb ");
+        if(MemUsed.length() > 6)
+            MemUsed.insert(MemUsed.length()-6,"mb ");
+        if(MemUsed.length() > 3)
+            MemUsed.insert(MemUsed.length()-3,"kb ");
+        MemUsed.insert(MemUsed.length(),"b");
+
+        return MemUsed;
+    }
+
+    void cpu()
+    {
+        if(CPUAverage.size() < 10)
+            CPUAverage.push_back(getCPUUsedByThisProgram());
+        else
+        {
+            CPUAverage.erase(CPUAverage.begin());
+            CPUAverage.push_back(getCPUUsedByThisProgram());
+        }
+    }
+
+    double getCPUUsedByThisProgram()
+    {
+
+        FILETIME ftime, fsys, fuser;
+        ULARGE_INTEGER now, sys, user;
+        double percent;
+
+        GetSystemTimeAsFileTime(&ftime);
+        memcpy(&now, &ftime, sizeof(FILETIME));
+
+        GetProcessTimes(self, &ftime, &ftime, &fsys, &fuser);
+        memcpy(&sys, &fsys, sizeof(FILETIME));
+        memcpy(&user, &fuser, sizeof(FILETIME));
+        percent = (sys.QuadPart - lastSysCPU.QuadPart) +
+            (user.QuadPart - lastUserCPU.QuadPart);
+        percent /= (now.QuadPart - lastCPU.QuadPart);
+        percent /= numProcessors;
+        lastCPU = now;
+        lastUserCPU = user;
+        lastSysCPU = sys;
+
+        if(std::isnan(percent * 100))
+            return 0;
+        return percent * 100;
+    }
+    double getCPUAverageUsedByThisProgram()
+    {
+        double cpuAvg;
+        for(auto &cpuEntry : CPUAverage)
+            cpuAvg += cpuEntry;
+        if(cpuAvg <= 0)
+            return 0;
+        return cpuAvg/10;
+    }
+
+    void init()
+    {
+        // If someone is making this multiplatform, Linux and Mac OS X versions here; https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+        SYSTEM_INFO sysInfo;
+        FILETIME ftime, fsys, fuser;
+
+        GetSystemInfo(&sysInfo);
+        numProcessors = sysInfo.dwNumberOfProcessors;
+
+        GetSystemTimeAsFileTime(&ftime);
+        memcpy(&lastCPU, &ftime, sizeof(FILETIME));
+
+        self = GetCurrentProcess();
+        GetProcessTimes(self, &ftime, &ftime, &fsys, &fuser);
+        memcpy(&lastSysCPU, &fsys, sizeof(FILETIME));
+        memcpy(&lastUserCPU, &fuser, sizeof(FILETIME));
+    }
+};
+MemAndCPUTracker MemAndCPU;
 
 void buildChunkImage();
 class Building;
@@ -1259,11 +1376,12 @@ public:
                     image.copy(tileImage,(pos.x-leftMost)*32,(pos.y-upMost)*32);
                 if(drawType == 2)
                 {
+
                     // If even one tile, even diagonal, isn't one of ours, draw.
                     int nearCounts = 0;
-                    for(auto &near : terr.territoryQuickList)
-                        if(near.x == pos.x || near.x == pos.x-1 || near.x == pos.x+1)
-                            if(near.y == pos.y || near.y == pos.y-1 || near.y == pos.y+1)
+                    for(auto &nearEntry : terr.territoryQuickList)
+                        if(nearEntry.x == pos.x || nearEntry.x == pos.x-1 || nearEntry.x == pos.x+1)
+                            if(nearEntry.y == pos.y || nearEntry.y == pos.y-1 || nearEntry.y == pos.y+1)
                                 nearCounts++;
 
 
@@ -1275,23 +1393,23 @@ public:
                     image.copy(tileImage,(pos.x-leftMost)*32,(pos.y-upMost)*32);
 
                     bool N = false, NE = false, E = false, SE = false, S = false, SW = false, W = false, NW = false;
-                    for(auto &near : terr.territoryQuickList)
+                    for(auto &nearEntry : terr.territoryQuickList)
                     {
-                        if(near.x == pos.x && near.y == pos.y-1)
+                        if(nearEntry.x == pos.x && nearEntry.y == pos.y-1)
                             N = true;
-                        if(near.x == pos.x+1 && near.y == pos.y-1)
+                        if(nearEntry.x == pos.x+1 && nearEntry.y == pos.y-1)
                             NE = true;
-                        if(near.x == pos.x+1 && near.y == pos.y)
+                        if(nearEntry.x == pos.x+1 && nearEntry.y == pos.y)
                             E = true;
-                        if(near.x == pos.x+1 && near.y == pos.y+1)
+                        if(nearEntry.x == pos.x+1 && nearEntry.y == pos.y+1)
                             SE = true;
-                        if(near.x == pos.x && near.y == pos.y+1)
+                        if(nearEntry.x == pos.x && nearEntry.y == pos.y+1)
                             S = true;
-                        if(near.x == pos.x-1 && near.y == pos.y+1)
+                        if(nearEntry.x == pos.x-1 && nearEntry.y == pos.y+1)
                             SW = true;
-                        if(near.x == pos.x-1 && near.y == pos.y)
+                        if(nearEntry.x == pos.x-1 && nearEntry.y == pos.y)
                             W = true;
-                        if(near.x == pos.x-1 && near.y == pos.y-1)
+                        if(nearEntry.x == pos.x-1 && nearEntry.y == pos.y-1)
                             NW = true;
                     }
                 }
@@ -1299,15 +1417,15 @@ public:
                 if(drawType == 4)
                 {
                     bool N = false, E = false, S = false, W = false;
-                    for(auto &near : terr.territoryQuickList)
+                    for(auto &nearEntry : terr.territoryQuickList)
                     {
-                        if(near.x == pos.x && near.y == pos.y-1)
+                        if(nearEntry.x == pos.x && nearEntry.y == pos.y-1)
                             N = true;
-                        if(near.x == pos.x+1 && near.y == pos.y)
+                        if(nearEntry.x == pos.x+1 && nearEntry.y == pos.y)
                             E = true;
-                        if(near.x == pos.x && near.y == pos.y+1)
+                        if(nearEntry.x == pos.x && nearEntry.y == pos.y+1)
                             S = true;
-                        if(near.x == pos.x-1 && near.y == pos.y)
+                        if(nearEntry.x == pos.x-1 && nearEntry.y == pos.y)
                             W = true;
                     }
 
@@ -1657,16 +1775,21 @@ void Faction::processBuildings()
         }
         if(building->owners.empty()) // Giving ownership of building to someone.
         {
-            std::cout << building->name << ": No owner. \n";
+            // std::cout << building->name << ": No owner. \n";
             std::shared_ptr<Creature> potentialOwner;
             potentialOwner = getRandomAgent(); // Grab a random civilian of the faction to make into the owner.
 
             if(potentialOwner->buildingsOwned.empty())
             { // give business to random
 
-                std::cout << "Giving " << building->name << " to " << potentialOwner->name << std::endl;
+                // std::cout << "Giving " << building->name << " to " << potentialOwner->name << std::endl;
                 building->owners.push_back(potentialOwner);
                 potentialOwner->buildingsOwned.push_back(building);
+                if(potentialOwner->work == nullptr)
+                { // Have them work at their new business if they don't have a place of work already.
+                    potentialOwner->work = building;
+                    building->workers.push_back(potentialOwner);
+                }
             }
             else
             { // If the random civvie already owns a business, go through list until you find one that doesn't.
@@ -1679,9 +1802,15 @@ void Faction::processBuildings()
                     }
                     if(agent->buildingsOwned.empty())
                     {
-                        std::cout << "Giving " << building->name << " to " << agent->name << std::endl;
+                        // std::cout << "Giving " << building->name << " to " << agent->name << std::endl;
                         building->owners.push_back(agent);
                         agent->buildingsOwned.push_back(building);
+
+                        if(agent->work == nullptr)
+                        { // Have them work at their new business if they don't have a place of work already.
+                            agent->work = building;
+                            building->workers.push_back(agent);
+                        }
 
                         break;
                     }
@@ -1690,12 +1819,23 @@ void Faction::processBuildings()
 
             if(building->owners.empty()) // If we STILL couldn't find someone to make the owner... give that original random civvie the business.
             {
-                std::cout << "Giving " << building->name << " to " << potentialOwner->name << std::endl;
+                // std::cout << "Giving " << building->name << " to " << potentialOwner->name << std::endl;
                 building->owners.push_back(potentialOwner);
                 potentialOwner->buildingsOwned.push_back(building);
+                if(potentialOwner->work == nullptr)
+                { // Have them work at their new business if they don't have a place of work already.
+                    potentialOwner->work = building;
+                    building->workers.push_back(potentialOwner);
+                }
 
             }
+
         }
+
+
+
+
+
     }
 }
 
@@ -3085,8 +3225,47 @@ void renderBuildings()
     window.setView(oldView);
 }
 
+void mouseHoverOnCreature()
+{
+    std::weak_ptr<Creature> closestCreature;
+    for(auto &agent : world.genPop)
+    {
+        // if(closestCreature )
+
+    }
+}
+
+void systemInfo()
+{
+    MemAndCPU.cpu();
+    // If someone is making this multiplatform, Linux and Mac OS X versions here; https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+    static int counter = 0;
+    if((counter % 5) == 0)
+    {
+
+
+
+        std::cout << "Total Virtual Memory: " << MemAndCPU.getTotalVirtualMem() << std::endl;
+        std::cout << "Virtual Memory Used : " << MemAndCPU.getVirtualMemUsedBySystem() << std::endl;
+
+
+        std::cout << "VM Used By This Prog: " << MemAndCPU.GetMemReadout() << std::endl;
+        std::cout << "CPUUsed By This Prog: " << MemAndCPU.getCPUUsedByThisProgram() << std::endl;
+        std::cout << "CPU Avg By This Prog: " << MemAndCPU.getCPUAverageUsedByThisProgram() << std::endl;
+
+
+    }
+
+
+
+    counter++;
+
+}
+
 void loop()
 {
+    systemInfo();
+
     applyCamera();
     updateMousePos();
     genPopMenuRefreshChecker();
@@ -3100,8 +3279,12 @@ void loop()
 
     shapes.createCircle(gvars::mousePos.x,gvars::mousePos.y,5,sf::Color::Cyan);
     fpsKeeper.calcFPS();
-    std::string fpsText = "FPS: " + std::to_string((int)fpsKeeper.framesPerSecond);
-    shapes.createText(5,5,30,sf::Color::White,fpsText, &gvars::hudView); // window.getView()
+    std::string fpsText = "FPS: " + std::to_string((int)fpsKeeper.framesPerSecond)
+    + "\n Mem: " + MemAndCPU.GetMemReadout()
+    + "\n CPU: " + std::to_string(MemAndCPU.getCPUUsedByThisProgram());
+    shapes.createText(5,5,15,sf::Color::White,fpsText, &gvars::hudView); // window.getView()
+
+    mouseHoverOnCreature();
 
     if(inputState.key[Key::K].time == 1)
     {
@@ -3228,8 +3411,12 @@ void loop()
 // Create the main window
 sf::RenderWindow window(sf::VideoMode(1280, 720), "Zenthium");
 
+
+
 int main()
 {
+    MemAndCPU.init();
+
 
 
     generateName();
