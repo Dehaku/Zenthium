@@ -568,10 +568,10 @@ public:
             }
             sf::Vector2i buildingPos = prodBuilding->worldPos;
 
-            std::cout << prodBuilding->name << " produces... \n";
+            // std::cout << prodBuilding->name << " produces... \n";
             for(int i = 0; i != prodBuilding->produces.size(); i++)
             {
-                std::cout << prodBuilding->produces[i].type << " : " << prodBuilding->produces[i].amount << std::endl;
+                // std::cout << prodBuilding->produces[i].type << " : " << prodBuilding->produces[i].amount << std::endl;
                 if(prodBuilding->produces[i].type == Resource::Food)
                     returnVar -= prodBuilding->produces[i].amount.toInt();
 
@@ -581,7 +581,7 @@ public:
 
 
 
-        std::cout << "NeedFood == " << returnVar << std::endl;
+        // std::cout << "NeedFood == " << returnVar << std::endl;
         return returnVar;
     }
     int getNeedFoodConstructionless()
@@ -615,7 +615,7 @@ public:
 
 
 
-        std::cout << "NeedHousing == " << returnVar << std::endl;
+        // std::cout << "NeedHousing == " << returnVar << std::endl;
         return returnVar;
     }
     int getNeedHousingConstructionless();
@@ -669,7 +669,7 @@ public:
                     std::cout << "Failed to get during random agent \n";
                     continue;
                 }
-                std::cout << i->name << "Random agent chosen: " << randomEntry << " of " << agents.size() << std::endl;
+                // std::cout << i->name << "Random agent chosen: " << randomEntry << " of " << agents.size() << std::endl;
 
                 return i;
             }
@@ -1697,7 +1697,7 @@ bool growTerritories(bool skipGrowGraphics = false) // returns true when nothing
 
 void Faction::processOrders()
 {
-    std::cout << "processOrders. \n";
+    // std::cout << "processOrders. \n";
 
     for(auto &order : orders)
     {
@@ -1727,17 +1727,12 @@ void Faction::processOrders()
                 }
 
                 sf::Vector2i factionCenter = getFactionCenter();
-                if(iterations == 2)
-                    std::cout << factionCenter.x << ", " << factionCenter.y << std::endl;
 
                 int xPos = factionCenter.x+random(-reachRange,reachRange);
                 int yPos = factionCenter.y+random(-reachRange,reachRange);
-                if(iterations == 2)
-                    std::cout << xPos << ", " << yPos << std::endl;
+
                 sf::Vector2i buildingPos = sf::Vector2i(std::max(std::min(xPos,98),1),std::max(std::min(yPos,98),1)); // Came back after awhile, this feels like a bad solution to whatever this was meant to achieve.
 
-                if(iterations == 2)
-                    std::cout << buildingPos.x << ", " << buildingPos.y << std::endl;
 
                 if(world.tiles[buildingPos.x][buildingPos.y].buildable && !world.tiles[buildingPos.x][buildingPos.y].builtOn)
                 {
@@ -1764,7 +1759,7 @@ void Faction::processOrders()
 
 void Faction::processBuildings()
 {
-    std::cout << "processBuildings. \n";
+    // std::cout << "processBuildings. \n";
 
     for(auto &building : buildings)
     {
@@ -3235,37 +3230,9 @@ void mouseHoverOnCreature()
     }
 }
 
-void systemInfo()
-{
-    MemAndCPU.cpu();
-    // If someone is making this multiplatform, Linux and Mac OS X versions here; https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
-    static int counter = 0;
-    if((counter % 5) == 0)
-    {
-
-
-
-        std::cout << "Total Virtual Memory: " << MemAndCPU.getTotalVirtualMem() << std::endl;
-        std::cout << "Virtual Memory Used : " << MemAndCPU.getVirtualMemUsedBySystem() << std::endl;
-
-
-        std::cout << "VM Used By This Prog: " << MemAndCPU.GetMemReadout() << std::endl;
-        std::cout << "CPUUsed By This Prog: " << MemAndCPU.getCPUUsedByThisProgram() << std::endl;
-        std::cout << "CPU Avg By This Prog: " << MemAndCPU.getCPUAverageUsedByThisProgram() << std::endl;
-
-
-    }
-
-
-
-    counter++;
-
-}
 
 void loop()
 {
-    systemInfo();
-
     applyCamera();
     updateMousePos();
     genPopMenuRefreshChecker();
@@ -3320,7 +3287,7 @@ void loop()
         sf::Clock factionTimer;
         factionTimer.restart();
 
-        std::cout << "New Day; Think Time. \n";
+        // std::cout << "New Day; Think Time. \n";
         for(auto &faction : world.factions)
         {
             if(!faction.get())
@@ -3329,11 +3296,11 @@ void loop()
                 continue;
             }
 
-            std::cout << "Faction: " << faction->name << ", Buildings: " << faction->buildings.size() << std::endl;
+            // std::cout << "Faction: " << faction->name << ", Buildings: " << faction->buildings.size() << std::endl;
             faction->thinkDay();
         }
 
-        std::cout << "End Day; Time Thunk: " << factionTimer.getElapsedTime().asMicroseconds() << std::endl;
+        // std::cout << "End Day; Time Thunk: " << factionTimer.getElapsedTime().asMicroseconds() << std::endl;
 
     }
 
